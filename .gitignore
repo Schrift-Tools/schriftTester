@@ -1,0 +1,6 @@
+input
+dev
+.DS_Store
+*Report.txt
+__pycache__
+*.pyc
