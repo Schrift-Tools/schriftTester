@@ -27,7 +27,28 @@ class TypeTester {
   // Read and parse the style, size, etc from data-* attributes
   // and initialize the type tester
   init() {
-    // Iterate over attributes
+    for (const [key, value] of Object.entries(this.container.dataset)) {
+      switch (key) {
+        case "font":
+          this.fontName = value.trim();
+          break;
+        case "styles":
+          const [current, styles] = value.split("|").map((item) => item.trim());
+          this.currentStyle = current;
+          this.styles = styles.split(";").map((item) => item.trim());
+          break;
+        case "size":
+        case "leading":
+        case "tracking":
+          const params = parseSliderParams(value)
+          console.log("value:", value, "parsed params:", params);
+          for (const [paramKey, paramValue] of Object.entries(params)) {
+            if (paramValue) this[key][paramKey] = paramValue;
+          };
+          break;
+      };
+    }
+  
     // Set instance variables accordingly
     // Create UI controls based on parsed attributes
     // Render the type tester
@@ -119,5 +140,33 @@ const patternNumber = /^([a-zA-Z0-9_ ]*?)\s*([0-9]*)$/;
 // - "[-5..0..20]" or "0.1" (label set to undefined)
 // - "labelName [-5..0..20]" or "labelName 0.9" (label set to labelName)
 function parseSliderParams(input) {
-  // Parse the things
+  try {
+    const matchSliderRange = input.match(patternSliderRange);
+    if (matchSliderRange) {
+      const [, label, min, , value, , max] = matchSliderRange;
+      // console.log('raw input:', input, "matchSliderRange:", matchSliderRange, "parsed params:", label, min, value, max)
+      return {
+        label: label,
+        value: parseFloat(value),
+        min: parseFloat(min),
+        max: parseFloat(max),
+      };
+    }
+
+    const matchNumber = input.match(patternNumber);
+    if (matchNumber) {
+      console.log(matchNumber);
+      const [_ , label, value] = matchNumber;
+      
+      return { 
+        label: label,
+        value: parseFloat(value),};
+    }
+    
+    throw new Error(`Invalid slider params string: ${input}`);
+
+  } catch (error) {
+    console.error(`${error.message}`);
+    return;
+  }
 }
