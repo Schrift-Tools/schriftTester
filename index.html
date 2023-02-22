@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SCHF Type Tester TEST</title>
+    <meta charset="utf-8" />
+    <link
+      href="https://fonts.fontdue.com/schrift-foundry/css/Rm9udENvbGxlY3Rpb246MTI0MDUyMzM3NzI0MDg1NjU3OA%3D%3D.css"
+      rel="stylesheet"
+    />
+    <link href="testerstyle.css" rel="stylesheet" />
+    <script src="typetester.js"></script>
+  </head>
+
+  <body>
+    <a href="index.html">reload</a>
+    <div name="typetester", 
+      data-font="Struve", 
+      data-styles="Regular|Light; Regular; Medium; Semibold; Bold", 
+      data-size="[4..80..300]",
+      data-leading="[0.9..1.2..1.5]",
+      data-tracking="[-5..0..20]",
+      data-alignment="Align [Left*, Center; Right; One line]", 
+      data-case="Case [Unchanged*; Uppercase; Lowercase; Capitalize]", 
+      data-features="
+        (Numerals|radio [Lining|lnum: 0; Tabular Lining|tnum: 1]);
+        (Stylistic sets|toggle [Set 1|ss01: 1; Set 2|ss02 : 0; Double story a|ss02 : 1]);
+        (Language alternates|radio [Bulgarian|bg:1; Serbian|sr:0])",
+      data-var="
+        (Width|wdth [0..500..0]);
+        (Slant|slnt [-10..0..10]);
+        (Optical size|opsz [4..10..48])",
+      data-random="Randomize"> 
+      sample text
+    </div>
+
+    <script>
+      let testers = initTypeTesters();
+      console.log(testers)
+    </script>
+</body>
+</html>

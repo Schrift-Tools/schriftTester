@@ -1,0 +1,44 @@
+* {
+    margin: 5px;
+    font-family: 'Struve Regular';
+}
+
+.tester-container {
+    position: absolute;
+    right: 50px;
+    min-height: 100vh;
+    width: 300px;
+}
+
+.lang {
+    color: #777777;
+    opacity: 0.8;
+}
+
+.lang:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+.tester-slider {
+    -webkit-appearance: none;
+    background: #777777;
+    width: 100%;
+    height: 5px;
+    opacity: .8;
+}
+
+.tester-slider:hover {
+    opacity: 1;
+}
+
+#sampletext {
+
+    left: 50px;
+    min-height: 100vh;
+    width: 75%;
+}
+
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
