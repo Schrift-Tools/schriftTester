@@ -1,5 +1,5 @@
 // Define a class for the type tester widget
-class TypeTester {
+class Tester {
 
   constructor(container) {
     this.container = container;
@@ -114,19 +114,19 @@ class TypeTester {
 }
 
 // Initialize all type tester widgets on the page
-function initTypeTesters() {
-  // Find all divs with attribute name="typetester"
-  const typetesterContainers = document.querySelectorAll('div[name="typetester"]');
-  const typeTesters = [];
-  // Create a TypeTester instance for each div and call the init method
-  typetesterContainers.forEach(container => {
-    const typeTester = new TypeTester(container);
-    typeTester.init();
-    typeTester.text = 'hello there';
-    console.log(typeTester)
-    typeTesters.push(typeTester)
+function initTesters() {
+  // Find all divs with attribute name="tester"
+  const testerContainers = document.querySelectorAll('div[name="tester"]');
+  const testers = [];
+  // Create a Tester instance for each div and call the init method
+  testerContainers.forEach(container => {
+    const tester = new Tester(container);
+    tester.init();
+    tester.text = 'hello there';
+    console.log(tester)
+    testers.push(tester)
   });
-  return typeTesters;
+  return testers;
 }
 
 // Regex expression to parse raw data-* attributes
