@@ -1,52 +1,102 @@
-// Define a class for the type tester widget
-class Tester {
+// Define a view class for the type tester widget
+class TesterView {
+  constructor(config, container) {
+    this.config = config
+    this.container = container
+    this.controlPanel = appendControlPanel(config.controlPlacement, container);
+    this.textSampleArea = appendTextSampleArea(config, container);
+    this.init()
+  }
+  
+  init(){
+    this.setContainerStyle();
+    this.placeUIElements();
+
+  }
+  placeUIElements() {
+    for (const elem in this.config) {
+      switch (elem) {
+        case "fontSize":
+        case "lineHeight":
+        case "letterSpacing":
+          if (this.config[elem].visible) {
+            appendSlider(this.config[elem], this.controlPanel, this.update.bind(this), elem);
+          };
+      }    
+    }
+  }
+
+
+  setContainerStyle() {
+    this.container.classList.add("tester");
+    this.container.style.display = "flex";
+    switch (this.config.controlPlacement) {
+      case "top":
+        this.container.style.flexDirection = "column";
+        break;
+      case "bottom":
+        this.container.style.flexDirection = "column-reverse";
+        this.container.style.height = "100vh";
+        break;
+      case "left":
+      this.container.style.justifyContent = "space-between";
+      this.container.style.flexDirection = "row";
+        break;
+      case "right":
+      this.container.style.justifyContent = "space-between";
+      this.container.style.flexDirection = "row-reverse";
+        break;
+      default:
+        // Default placement is left
+        this.container.style.justifyContent = "space-between";
+        this.container.style.flexDirection = "row";
+
+        
+    }
+  }
+
+  update(propName) {
+    switch (propName) {
+      case "fontSize":
+      case "lineHeight":
+      case "letterSpacing":
+        this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
+    }
+  }
+}
+
+// Define a config class for the type tester widget
+class TesterConfig {
   constructor(container) {
-    this.container = container;
-    this.fontName = null;
-    this.styles = {
-      label: "Styles",
-      value: "Regular",
-      options: ["Regular"],
-    };
-    this.size = { label: "Size", value: 80, min: 4, max: 300 };
-    this.leading = {
-      label: "Leading",
-      value: 1.2,
-      min: 0.9,
-      max: 1.5,
-    };
-    this.tracking = { label: "Tracking", value: 0, min: -5, max: 20 };
-    this.alignment = {
-      label: "Left",
-      value: "Left",
-      options: ["Left", "Right"],
-    };
-    this.case = {
-      label: "Case",
-      value: "Unchanged",
-      options: ["Unchanged", "Lowercase", "Capitalize"],
-    };
+    this.rawDate = container.dataset;
+    this.controlPlacement = { panel: 'left' };
+    this.labelFont = null;
+    this.fontFamily = null;
+    this.labelFont = null;
+    this.styles = { label: "Styles", value: "Regular", options: ["Regular"], visible: true, };
+    this.fontSize = { label: "Size", value: 80, min: 4, max: 300, units: 'px', visible: true, };
+    this.lineHeight = { label: "Leading", value: 100, min: 75, max: 150, step: 0.1, units: '%', visible: true, };
+    this.letterSpacing = { label: "Tracking", value: 0, min: -5, max: 20, step: 0.1, units: 'px', visible: true, };
+    this.alignment = { label: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
+    this.case = { label: "Case", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
     this.features = {};
     this.variations = {};
+    this.text = "";
     this.editable = true;
-
-    Object.defineProperty(this, "text", {
-      get() {
-        return this.container.innerHTML.trim();
-      },
-      set() {
-        this.updateText();
-      },
-    });
+    this.init()
   }
 
   // Read and parse the style, size, etc from data-* attributes
   // and initialize the type tester
   init() {
-    for (const [key, value] of Object.entries(this.container.dataset)) {
+    
+    for (const [key, value] of Object.entries(this.rawDate)) {
       switch (key) {
-        case "font":
-          this.fontName = value.trim();
+        case "text":
+        case "labelFont":
+        case "controlPlacement":
+        case "fontFamily":
+          this[key] = value
           break;
         case "styles":
         case "alignment":
@@ -55,107 +105,90 @@ class Tester {
           for (const [paramKey, paramValue] of Object.entries(optionsParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
-              console.log(key, "=>", paramKey, ":", paramValue);
+              // console.log(key, "=>", paramKey, ":", paramValue);
             }
           }
           break;
-        case "size":
-        case "leading":
-        case "tracking":
+        case "fontSize":
+        case "lineHeight":
+        case "letterSpacing":
           const sliderParams = parseSliderParams(value);
           for (const [paramKey, paramValue] of Object.entries(sliderParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
-              console.log(key, "=>", paramKey, ":", paramValue);
+              // console.log(key, "=>", paramKey, ":", paramValue);
             }
           }
           break;
-      }
-    }
-
-    // Set instance variables accordingly
-    // Create UI controls based on parsed attributes
-    // Render the type tester
-
-    // Turn div editable if necessary
-    if (this.editable) {
-      this.container.contentEditable = "true";
-    }
-  }
-
-  // Create a dropdown UI control
-  createDropdown(label, options, defaultOption, onChange) {
-    // Create a dropdown with a label and options
-    // Set the default selected option
-    // Attach the onChange function to the change event of the dropdown
-    // Return the dropdown
-  }
-
-  // Create a slider UI control
-  createSlider(label, axis, min, max, defaultVal, onChange) {
-    // Create a slider with a label and axis
-    // Set the minimum, maximum and default values
-    // Attach the onChange function to the input event of the slider
-    // Return the slider
-  }
-
-  // Create a special radio toggles UI control with customizable icons
-  createSpecialRadioToggles(label, options, defaultOption, icons, onChange) {
-    // Create a block of radio toggles with a label and options
-    // Set the default selected option
-    // Use the icons object to set the icons for each option
-    // Attach the onChange function to the change event of the radio toggles
-    // Return the radio toggles block
-  }
-
-  // Create a special checkbox toggles UI control with customizable icons
-  createSpecialCheckboxToggles(label, options, defaultOption, icons, onChange) {
-    // Create a block of checkbox toggles with a label and options
-    // Set the default selected option
-    // Use the icons object to set the icons for each option
-    // Attach the onChange function to the change event of the checkbox toggles
-    // Return the checkbox toggles block
-  }
-
-  // Create a button UI control
-  createButton(label, onClick) {
-    // Create a button with a label
-    // Attach the onClick function to the click event of the button
-    // Return the button
-  }
-
-  // Render the type tester UI
-  render() {
-    // Render the text sample area
-    // Render each UI control in the order they appear in the data-* attributes
-    // Attach the UI controls to the container
-  }
-
-  // Update the text sample
-  updateText() {
-    // Update the text sample area with the current style settings
+      } 
+    } 
   }
 }
 
-// Initialize all type tester widgets on the page
+class Tester {
+  constructor(html_container) {
+    this.config = new TesterConfig(html_container)
+    this.view = new TesterView(this.config, html_container)
+  }
+}
+
 function initTesters() {
-  // Find all divs with attribute name="tester"
   const testerContainers = document.querySelectorAll('div[name="tester"]');
   const testers = [];
-  // Create a Tester instance for each div and call the init method
+  
   testerContainers.forEach((container) => {
     const tester = new Tester(container);
-    tester.init();
-    tester.text = "hello there";
-    // console.log(tester)
     testers.push(tester);
   });
   return testers;
 }
 
-// Parse raw string for slider params,
-// optionally including a parameter name, and return an object
-// with the parsed values as floats and the label (undefined if not present).
+
+function appendSlider(sliderParams, container, update, propName) {
+  
+  var wrapper = document.createElement("div");
+  var labels = document.createElement("div");
+  var labelName = document.createElement("div");
+  var labelValue = document.createElement("div");
+  var labelNameText = document.createTextNode(sliderParams.label);
+  var labelValueText = document.createTextNode(sliderParams.value + " " + sliderParams.units);
+  var slider = document.createElement("input");
+
+  labelName.classList.add("control-panel-label-name");
+  labelValue.classList.add("control-panel-label-value");
+  slider.classList.add("control-panel-slider");
+  wrapper.classList.add("control-panel-slider-container");
+
+  slider.type = "range";
+  slider.min = sliderParams.min;
+  slider.max = sliderParams.max;
+  slider.value = sliderParams.value;
+
+  if (sliderParams.step) slider.step = sliderParams.step;
+  
+  slider.oninput = () => {
+    labelValueText.nodeValue = slider.value + " " + sliderParams.units;
+    sliderParams.value = slider.value;
+    update(propName, sliderParams.value)
+  }
+
+  labels.style.display = "flex";
+  labels.style.flexDirection = "row";
+  labels.style.flexWrap = "nowrap";
+  labels.style.justifyContent = "space-between";
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = "column";
+
+  labelName.appendChild(labelNameText);
+  labelValue.appendChild(labelValueText);
+  labels.appendChild(labelName);
+  labels.appendChild(labelValue);
+  wrapper.appendChild(labels);
+  wrapper.appendChild(slider);
+  container.appendChild(wrapper);
+}
+
+
 // The valid formats are:
 // - "[-5..0..20]" or "0.1" (label set to undefined)
 // - "labelName [-5..0..20]" or "labelName 0.9" (label set to labelName)
@@ -167,7 +200,7 @@ function parseSliderParams(input) {
     const matchSliderRange = input.match(patternSliderRange);
     if (matchSliderRange) {
       var [, label, min, , value, , max] = matchSliderRange;
-      if (label) label = label.trim()
+      if (label) label = label.trim();
       return {
         label: label,
         value: parseFloat(value),
@@ -175,11 +208,11 @@ function parseSliderParams(input) {
         max: parseFloat(max),
       };
     }
-    
+
     const matchNumber = input.match(patternNumber);
     if (matchNumber) {
       var [_, label, value] = matchNumber;
-      if (label) label = label.trim()
+      if (label) label = label.trim();
       return {
         label: label,
         value: parseFloat(value),
@@ -191,6 +224,45 @@ function parseSliderParams(input) {
     console.error(`${error.message}`);
     return;
   }
+}
+
+function appendControlPanel(align, container) {
+  var controlPanel = document.createElement("div");
+  controlPanel.classList.add("control-panel");
+  // controlPanel.style.borderWidth = "thick";
+  switch (align){
+    case "left":
+      controlPanel.style.borderWidth = "0 1px 0 0";
+      controlPanel.style.minHeight = "100vh";
+      break;
+    case "right":
+      controlPanel.style.borderWidth = " 0 0 0 1px";
+      controlPanel.style.minHeight = "100vh";
+      break;
+    case "top":
+      controlPanel.style.borderWidth = "1px 0 0 0";
+      break;
+    case "bottom":
+      controlPanel.style.borderWidth = "1px 0 0 0";
+      break;
+}
+  container.appendChild(controlPanel);
+  return controlPanel;
+}
+
+function appendTextSampleArea(config, container) {
+  var textSampleArea = document.createElement("div");
+  var textSample = document.createTextNode(config.text);
+  if (config.editable) {
+    textSampleArea.contentEditable = true;
+  }
+  textSampleArea.appendChild(textSample);
+  textSampleArea.style.flexGrow = "1";
+  textSampleArea.style.fontFamily = config.fontFamily + " " + config.styles.value;
+  textSampleArea.style.fontSize = config.fontSize.value + config.fontSize.units
+  textSampleArea.classList.add("text-sample-area");
+  container.appendChild(textSampleArea);
+  return textSampleArea;
 }
 
 function parseOptionsParams(input) {
