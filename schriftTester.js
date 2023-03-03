@@ -11,8 +11,9 @@ class TesterView {
   init(){
     this.setContainerStyle();
     this.placeUIElements();
-
+    this.update();
   }
+
   placeUIElements() {
     for (const elem in this.config) {
       switch (elem) {
@@ -25,7 +26,6 @@ class TesterView {
       }    
     }
   }
-
 
   setContainerStyle() {
     this.container.classList.add("tester");
@@ -50,8 +50,6 @@ class TesterView {
         // Default placement is left
         this.container.style.justifyContent = "space-between";
         this.container.style.flexDirection = "row";
-
-        
     }
   }
 
@@ -88,7 +86,6 @@ class TesterConfig {
   // Read and parse the style, size, etc from data-* attributes
   // and initialize the type tester
   init() {
-    
     for (const [key, value] of Object.entries(this.rawDate)) {
       switch (key) {
         case "text":
@@ -144,7 +141,6 @@ function initTesters() {
 
 
 function appendSlider(sliderParams, container, update, propName) {
-  
   var wrapper = document.createElement("div");
   var labels = document.createElement("div");
   var labelName = document.createElement("div");
@@ -187,6 +183,43 @@ function appendSlider(sliderParams, container, update, propName) {
   container.appendChild(wrapper);
 }
 
+function appendControlPanel(align, container) {
+  var controlPanel = document.createElement("div");
+  controlPanel.classList.add("control-panel");
+  switch (align){
+    case "left":
+      controlPanel.style.borderWidth = "0 1px 0 0";
+      controlPanel.style.minHeight = "100vh";
+      break;
+    case "right":
+      controlPanel.style.borderWidth = " 0 0 0 1px";
+      controlPanel.style.minHeight = "100vh";
+      break;
+    case "top":
+      controlPanel.style.borderWidth = "1px 0 0 0";
+      break;
+    case "bottom":
+      controlPanel.style.borderWidth = "1px 0 0 0";
+      break;
+}
+  container.appendChild(controlPanel);
+  return controlPanel;
+}
+
+function appendTextSampleArea(config, container) {
+  var textSampleArea = document.createElement("div");
+  var textSample = document.createTextNode(config.text);
+  if (config.editable) {
+    textSampleArea.contentEditable = true;
+  }
+  textSampleArea.appendChild(textSample);
+  textSampleArea.style.flexGrow = "1";
+  textSampleArea.style.fontFamily = config.fontFamily + " " + config.styles.value;
+  textSampleArea.style.fontSize = config.fontSize.value + config.fontSize.units
+  textSampleArea.classList.add("text-sample-area");
+  container.appendChild(textSampleArea);
+  return textSampleArea;
+}
 
 // The valid formats are:
 // - "[-5..0..20]" or "0.1" (label set to undefined)
@@ -223,45 +256,6 @@ function parseSliderParams(input) {
     console.error(`${error.message}`);
     return;
   }
-}
-
-function appendControlPanel(align, container) {
-  var controlPanel = document.createElement("div");
-  controlPanel.classList.add("control-panel");
-  // controlPanel.style.borderWidth = "thick";
-  switch (align){
-    case "left":
-      controlPanel.style.borderWidth = "0 1px 0 0";
-      controlPanel.style.minHeight = "100vh";
-      break;
-    case "right":
-      controlPanel.style.borderWidth = " 0 0 0 1px";
-      controlPanel.style.minHeight = "100vh";
-      break;
-    case "top":
-      controlPanel.style.borderWidth = "1px 0 0 0";
-      break;
-    case "bottom":
-      controlPanel.style.borderWidth = "1px 0 0 0";
-      break;
-}
-  container.appendChild(controlPanel);
-  return controlPanel;
-}
-
-function appendTextSampleArea(config, container) {
-  var textSampleArea = document.createElement("div");
-  var textSample = document.createTextNode(config.text);
-  if (config.editable) {
-    textSampleArea.contentEditable = true;
-  }
-  textSampleArea.appendChild(textSample);
-  textSampleArea.style.flexGrow = "1";
-  textSampleArea.style.fontFamily = config.fontFamily + " " + config.styles.value;
-  textSampleArea.style.fontSize = config.fontSize.value + config.fontSize.units
-  textSampleArea.classList.add("text-sample-area");
-  container.appendChild(textSampleArea);
-  return textSampleArea;
 }
 
 function parseOptionsParams(input) {
