@@ -101,7 +101,7 @@ class TesterConfig {
           for (const [paramKey, paramValue] of Object.entries(optionsParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
-              // console.log(key, "=>", paramKey, ":", paramValue);
+              log(`${key} => ${paramKey}: ${paramValue}`);
             }
           }
           break;
@@ -109,26 +109,26 @@ class TesterConfig {
         case "lineHeight":
         case "letterSpacing":
           const sliderParams = parseSliderParams(value.trim());
-          // console.log('input:', value)
+          log(`input: ${value}`);
           for (const [paramKey, paramValue] of Object.entries(sliderParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
-              console.log(key, "=>", paramKey, ":", paramValue);
+              log(`${key} => ${paramKey}: ${paramValue}`);
             } else {
-              console.log(key, "-|", paramKey, ":", paramValue);
+              log(`${key} -| ${paramKey}: ${paramValue}`);
               if (paramKey === "unitsLabel") {
                 if (sliderParams.units) {
                   this[key][paramKey] = sliderParams.units;
                 } else {
                   this[key][paramKey] = this[key].units;
                 }
-                console.log("assigned:", this[key][paramKey]);
+                log(`assigned: ${this[key][paramKey]}`);
               }
           }
           }
           break;
       } 
-      console.log("\n")
+      log(`\n`);
     } 
   }
 }
@@ -244,7 +244,6 @@ function parseSliderParams(input) {
   try {
     const matchSliderRange = input.match(patternSliderRange);
     if (matchSliderRange) {
-      // console.log(matchSliderRange.groups);
       return matchSliderRange.groups;
     }
 
@@ -326,4 +325,10 @@ function parseOptionsParams(input) {
     console.error(`${error.message}`);
     return;
   }
+}
+
+let LOGGING_IS_ON = false;
+
+function log(message) {
+  if (LOGGING_IS_ON) {console.log(message)};
 }
