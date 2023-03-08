@@ -71,9 +71,9 @@ class TesterConfig {
     this.labelFont = null;
     this.fontFamily = null;
     this.styles = { label: "Styles", value: "Regular", options: ["Regular"], visible: true, };
-    this.fontSize = { label: "Size", value: 80, min: 4, max: 300, units: 'px', visible: true, };
-    this.lineHeight = { label: "Leading", value: 100, min: 75, max: 150, step: 0.1, units: '%', visible: true, };
-    this.letterSpacing = { label: "Tracking", value: 0, min: -5, max: 20, step: 0.1, units: 'px', visible: true, };
+    this.fontSize = { label: "Size", value: 80, min: 4, max: 300, units: 'px', unitsLabel: null, visible: true, };
+    this.lineHeight = { label: "Leading", value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
+    this.letterSpacing = { label: "Tracking", value: 0, min: -5, max: 20, step: 0.1, units: 'px', unitsLabel: null, visible: true, };
     this.alignment = { label: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
     this.case = { label: "Case", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
     this.features = {};
@@ -108,15 +108,27 @@ class TesterConfig {
         case "fontSize":
         case "lineHeight":
         case "letterSpacing":
-          const sliderParams = parseSliderParams(value);
+          const sliderParams = parseSliderParams(value.trim());
+          // console.log('input:', value)
           for (const [paramKey, paramValue] of Object.entries(sliderParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
-              // console.log(key, "=>", paramKey, ":", paramValue);
-            }
+              console.log(key, "=>", paramKey, ":", paramValue);
+            } else {
+              console.log(key, "-|", paramKey, ":", paramValue);
+              if (paramKey === "unitsLabel") {
+                if (sliderParams.units) {
+                  this[key][paramKey] = sliderParams.units;
+                } else {
+                  this[key][paramKey] = this[key].units;
+                }
+                console.log("assigned:", this[key][paramKey]);
+              }
+          }
           }
           break;
       } 
+      console.log("\n")
     } 
   }
 }
@@ -146,7 +158,7 @@ function appendSlider(sliderParams, container, update, propName) {
   var labelName = document.createElement("div");
   var labelValue = document.createElement("div");
   var labelNameText = document.createTextNode(sliderParams.label);
-  var labelValueText = document.createTextNode(sliderParams.value + " " + sliderParams.units);
+  var labelValueText = document.createTextNode(sliderParams.value + " " + sliderParams.unitsLabel);
   var slider = document.createElement("input");
 
   labelName.classList.add("control-panel-label-name");
@@ -162,7 +174,7 @@ function appendSlider(sliderParams, container, update, propName) {
   if (sliderParams.step) slider.step = sliderParams.step;
   
   slider.oninput = () => {
-    labelValueText.nodeValue = slider.value + " " + sliderParams.units;
+    labelValueText.nodeValue = slider.value + " " + sliderParams.unitsLabel;
     sliderParams.value = slider.value;
     update(propName, sliderParams.value)
   }
@@ -222,23 +234,18 @@ function appendTextSampleArea(config, container) {
 }
 
 // The valid formats are:
-// - "[-5..0..20]" or "0.1" (label set to undefined)
-// - "labelName [-5..0..20]" or "labelName 0.9" (label set to labelName)
+// - "0.1" or "[-5..0..20]" (label set to undefined)
+// - "labelName 0.9" or "labelName [-5..0..20]" (label set to labelName)
+// - "labelName [-5..0..20] unitLabel | units"
+// - "labelName [-5..0..20] units" (unitLabel set to units)
 function parseSliderParams(input) {
-  const patternSliderRange =
-    /^([a-zA-Z0-9_ ]+)?\s*\[\s*(-?\d+(\.\d+)?)\.\.(-?\d+(\.\d+)?)\.\.(-?\d+(\.\d+)?)\s*\]$/;
-  const patternNumber = /^([a-zA-Z0-9_ ]*?)\s*([0-9]*)$/;
+  const patternSliderRange = /^\s?(?<label>[a-zA-Z0-9_!"#$%&'()*+,-.:;~ ]*?)?\s*\[\s*(?<min>-?\d+(\.\d+)?)\s*?\.\.\s*?(?<value>-?\d+(\.\d+)?)\s*?\.\.\s*?(?<max>-?\d+(\.\d+)?)\s*\]\s*(?:\s*(?<unitsLabel>[a-zA-Z0-9_!"#$%&'()*+,-.:;~ ]+?)\s*(?:=|\|\s?)\s*)?(?<units>[a-zA-Z0-9_!"#$%&'()*+,-.:;~ ]+?)?\s?$/;
+  const patternNumber = /^([a-zA-Z0-9_ ]*?)\s*([0-9]*)/;
   try {
     const matchSliderRange = input.match(patternSliderRange);
     if (matchSliderRange) {
-      var [, label, min, , value, , max] = matchSliderRange;
-      if (label) label = label.trim();
-      return {
-        label: label,
-        value: parseFloat(value),
-        min: parseFloat(min),
-        max: parseFloat(max),
-      };
+      // console.log(matchSliderRange.groups);
+      return matchSliderRange.groups;
     }
 
     const matchNumber = input.match(patternNumber);
