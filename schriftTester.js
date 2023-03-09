@@ -239,8 +239,8 @@ function appendTextSampleArea(config, container) {
 // - "labelName [-5..0..20] unitLabel | units"
 // - "labelName [-5..0..20] units" (unitLabel set to units)
 function parseSliderParams(input) {
-  const patternSliderRange = /^\s?(?<label>[a-zA-Z0-9_!"#$%&'()*+,-.:;~ ]*?)?\s*\[\s*(?<min>-?\d+(\.\d+)?)\s*?\.\.\s*?(?<value>-?\d+(\.\d+)?)\s*?\.\.\s*?(?<max>-?\d+(\.\d+)?)\s*\]\s*(?:\s*(?<unitsLabel>[a-zA-Z0-9_!"#$%&'()*+,-.:;~ ]+?)\s*(?:=|\|\s?)\s*)?(?<units>[a-zA-Z0-9_!"#$%&'()*+,-.:;~ ]+?)?\s?$/;
-  const patternNumber = /^([a-zA-Z0-9_ ]*?)\s*([0-9]*)/;
+  const patternSliderRange = /^\s?(?<label>[\p{L}\p{P}\p{N}\p{Zs}\p{Emoji}]*?)?\s*\[\s*(?<min>-?\d+(\.\d+)?)\s*?\.\.\s*?(?<value>-?\d+(\.\d+)?)\s*?\.\.\s*?(?<max>-?\d+(\.\d+)?)\s*\]\s*(?:\s*(?<unitsLabel>[\p{L}\p{P}\p{N}\p{Zs}\p{Emoji}]+?)\s*(?:=|\|\s?)\s*)?(?<units>[a-zA-Z% ]+?)?\s?$/u;
+  const patternNumber = /^\s?(?<label>[^\p{N}][\p{L}\p{P}\p{N}\p{Zs}\p{Emoji}]*?)?\s*(?<value>-?\d+(\.\d+)?)(?:\s*(?<unitsLabel>[^\p{N}][\p{L}\p{P}\p{N}\p{Zs}\p{Emoji}]+?)\s*(?:=|\|\s?)\s*)?(?<units>[a-zA-Z% ]+?)?\s?$/u;
   try {
     const matchSliderRange = input.match(patternSliderRange);
     if (matchSliderRange) {
