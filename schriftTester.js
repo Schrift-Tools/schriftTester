@@ -61,10 +61,21 @@ class TesterView {
 
   update(propName) {
     switch (propName) {
-      case "lineHeight":
-      case "letterSpacing":
       case "fontSize":
         this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
+      case "letterSpacing":
+        if (this.config["letterSpacing"].units === '%') {
+          var units = this.config.fontSize.units;
+          var value = this.config.fontSize.value / 100 * this.config["letterSpacing"].value;
+        } else {
+          var units = this.config["letterSpacing"].units;
+          var value = this.config["letterSpacing"].value;
+        }
+        this.textSampleArea.style["letterSpacing"] = value + units;
+        break;
+      case "lineHeight":
+        this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
+
     }
   }
 }
@@ -76,10 +87,10 @@ class TesterConfig {
     this.controlPlacement = { panel: 'left' };
     this.labelFont = null;
     this.fontFamily = null;
-    this.styles = { label: "Styles", value: "Regular", options: ["Regular"], visible: true, };
-    this.fontSize = { label: "Size", value: 80, min: 4, max: 300, units: 'px', unitsLabel: null, visible: true, };
+    this.style = { label: "Style", value: "Regular", options: ["Regular"], visible: true, };
+    this.fontSize = { label: "Size", value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
     this.lineHeight = { label: "Leading", value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
-    this.letterSpacing = { label: "Tracking", value: 0, min: -5, max: 20, step: 0.1, units: 'px', unitsLabel: null, visible: true, };
+    this.letterSpacing = { label: "Tracking", value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.alignment = { label: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
     this.case = { label: "Case", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
     this.features = {};
@@ -100,9 +111,9 @@ class TesterConfig {
         case "fontFamily":
           this[key] = value
           break;
-        case "styles":
         case "alignment":
         case "case":
+        case "style":
           const optionsParams = parseOptionsParams(value);
           for (const [paramKey, paramValue] of Object.entries(optionsParams)) {
             if (paramValue) {
@@ -368,7 +379,7 @@ function parseOptionsParams(input) {
   }
 }
 
-let LOGGING_IS_ON = false;
+let LOGGING_IS_ON = true;
 
 function log(message) {
   if (LOGGING_IS_ON) {console.log(message)};
