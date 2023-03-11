@@ -23,6 +23,12 @@ class TesterView {
           if (this.config[elem].visible) {
             appendSlider(this.config[elem], this.controlPanel, this.update.bind(this), elem);
           };
+          break;
+        case "style": {
+          if (this.config[elem].visible) {
+            appendDropdown(this.config[elem], this.controlPanel, this.update.bind(this), elem);
+          };
+        }
       }    
     }
   }
@@ -55,9 +61,9 @@ class TesterView {
 
   update(propName) {
     switch (propName) {
-      case "fontSize":
       case "lineHeight":
       case "letterSpacing":
+      case "fontSize":
         this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
     }
   }
@@ -104,6 +110,9 @@ class TesterConfig {
               log(`${key} => ${paramKey}: ${paramValue}`);
             }
           }
+          if (key === "style"){
+          this[key]['label'] = this[key]['value'];
+        }
           break;
         case "fontSize":
         case "lineHeight":
@@ -152,6 +161,37 @@ function initTesters() {
 }
 
 
+function appendDropdown(sliderParams, container, update, propName) {
+  var wrapper = document.createElement("div");
+  var valuePicker = document.createElement("div");
+  var currentValue = document.createElement("div");
+  var currentValueText = document.createTextNode(sliderParams.label);
+  var downButton = document.createElement("div");
+  var downButtonIcon = document.createTextNode("@chevrondown");
+  var line = document.createElement("div");
+  
+  downButton.classList.add("tester-icons");
+  line.classList.add("tester-line-separator");
+  wrapper.classList.add("control-panel-container");
+
+  valuePicker.style.display = "flex";
+  valuePicker.style.flexDirection = "row";
+  valuePicker.style.flexWrap = "nowrap";
+  valuePicker.style.justifyContent = "space-between";
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = "column";
+  
+
+  currentValue.appendChild(currentValueText);
+  downButton.appendChild(downButtonIcon);
+  valuePicker.appendChild(currentValue);
+  valuePicker.appendChild(downButton);
+  wrapper.appendChild(valuePicker);
+  wrapper.appendChild(line);
+  container.appendChild(wrapper);
+  
+}
+
 function appendSlider(sliderParams, container, update, propName) {
   var wrapper = document.createElement("div");
   var labels = document.createElement("div");
@@ -164,7 +204,8 @@ function appendSlider(sliderParams, container, update, propName) {
   labelName.classList.add("control-panel-label-name");
   labelValue.classList.add("control-panel-label-value");
   slider.classList.add("control-panel-slider");
-  wrapper.classList.add("control-panel-slider-container");
+  wrapper.classList.add("control-panel-container");
+  wrapper.style.flexDirection = "column";
 
   slider.type = "range";
   slider.min = sliderParams.min;
@@ -226,7 +267,7 @@ function appendTextSampleArea(config, container) {
   }
   textSampleArea.appendChild(textSample);
   textSampleArea.style.flexGrow = "1";
-  textSampleArea.style.fontFamily = config.fontFamily + " " + config.styles.value;
+  textSampleArea.style.fontFamily = config.fontFamily + " " + config.style.value;
   textSampleArea.style.fontSize = config.fontSize.value + config.fontSize.units
   textSampleArea.classList.add("text-sample-area");
   container.appendChild(textSampleArea);
