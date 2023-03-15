@@ -11,7 +11,9 @@ class TesterView {
   init(){
     this.setContainerStyle();
     this.placeUIElements();
-    this.update();
+    for (const option in this.config) {
+      this.update(option);
+    }
   }
 
   placeUIElements() {
