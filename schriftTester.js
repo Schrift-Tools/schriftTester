@@ -26,7 +26,7 @@ class TesterView {
           break;
         case "style": {
           if (this.config[elem].visible) {
-            appendDropdown(this.config[elem], this.controlPanel, this.update.bind(this), elem);
+            appendDropdown(this.config, elem, this.controlPanel, this.update.bind(this));
           };
         }
       }    
@@ -75,6 +75,10 @@ class TesterView {
         break;
       case "lineHeight":
         this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
+        break;
+      case "style":
+        this.textSampleArea.style.fontFamily = this.config.fontFamily + " " + this.config.style.value
+        break;
 
     }
   }
@@ -172,19 +176,39 @@ function initTesters() {
 }
 
 
-function appendDropdown(sliderParams, container, update, propName) {
+function appendDropdown(config, paramName, container, update) {
+  let dropdownParams = config[paramName]
   var wrapper = document.createElement("div");
   var valuePicker = document.createElement("div");
   var currentValue = document.createElement("div");
-  var currentValueText = document.createTextNode(sliderParams.label);
+  var currentValueText = document.createTextNode(dropdownParams.value);
   var downButton = document.createElement("div");
   var downButtonIcon = document.createTextNode("@chevrondown");
   var line = document.createElement("div");
+  var menuPanel = document.createElement("div");
   
-  downButton.classList.add("tester-icons");
-  line.classList.add("tester-line-separator");
-  wrapper.classList.add("control-panel-container");
+  for (const option of dropdownParams.options) {
+    var menuElement = document.createElement("div");
+    var menuElementText = document.createTextNode(option);
+    menuElement.appendChild(menuElementText);
+    menuElement.classList.add('tester-menu-panel-element');
+    menuElement.classList.add("tester-button");
+    
+    menuPanel.appendChild(menuElement);
+    menuElement.onclick = function () {
+      config[paramName].value = option;
+      currentValueText.nodeValue = option;
+      menuPanel.classList.toggle("tester-menu-panel-show");
+      update(paramName);
+    };
+  }
 
+  downButton.classList.add("tester-icons");
+  valuePicker.classList.add("tester-button");
+  line.classList.add("tester-line-separator");
+  menuPanel.classList.add("tester-menu-panel");
+  wrapper.classList.add("control-panel-container");
+  
   valuePicker.style.display = "flex";
   valuePicker.style.flexDirection = "row";
   valuePicker.style.flexWrap = "nowrap";
@@ -192,6 +216,14 @@ function appendDropdown(sliderParams, container, update, propName) {
   wrapper.style.display = "flex";
   wrapper.style.flexDirection = "column";
   
+  valuePicker.onclick = function () {
+    menuPanel.classList.toggle("tester-menu-panel-show");
+    for (const child of menuPanel.children) {
+      console.log(child.textContent, config[paramName].value, child.textContent === config[paramName].value)
+      child.textContent === config[paramName].value ? child.classList.add("tester-menu-panel-element-current") : child.classList.remove("tester-menu-panel-element-current");
+    }
+  };
+
 
   currentValue.appendChild(currentValueText);
   downButton.appendChild(downButtonIcon);
@@ -199,6 +231,7 @@ function appendDropdown(sliderParams, container, update, propName) {
   valuePicker.appendChild(downButton);
   wrapper.appendChild(valuePicker);
   wrapper.appendChild(line);
+  wrapper.appendChild(menuPanel);
   container.appendChild(wrapper);
   
 }
@@ -324,6 +357,8 @@ function parseOptionsParams(input) {
     const matchNamed = input.match(patternNamedOptionList);
     const matchUnnamed = input.match(patternUnnamedOptionList);
 
+    console.log("matchNamed", matchNamed)
+    console.log("matchUnnamed", matchUnnamed)
     // If input is named
     if (matchNamed) {
       const label = matchNamed[1].trim(); // Extract label from input
@@ -337,8 +372,9 @@ function parseOptionsParams(input) {
         defaultValueIndex >= 0
           ? options[defaultValueIndex].slice(0, -1)
           : options[0]; // Extract default value from options
-      const optionsOptions = options.filter((option) => !option.endsWith("*")); // Extract options options from options
-      return { label: label, value: defaultValue, options: optionsOptions };
+          const optionsOptions = options.map((option) => !option.endsWith("*")); // Extract options options from options
+          // const optionsOptions = options.filter((option) => !option.endsWith("*")); // Extract options options from options
+          return { label: label, value: defaultValue, options: optionsOptions };
 
       // If input is unnamed
     } else if (matchUnnamed) {
@@ -356,8 +392,8 @@ function parseOptionsParams(input) {
           defaultValueIndex >= 0
             ? options[defaultValueIndex].slice(0, -1)
             : options[0]; // Extract default value from options
-        const optionsOptions = options.filter(
-          (option) => !option.endsWith("*")
+        const optionsOptions = options.map(
+          (option) => option.endsWith("*") ? option.slice(0, -1) : option
         ); // Extract options options from options
         return { label: label, value: defaultValue, options: optionsOptions };
 

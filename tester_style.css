@@ -31,6 +31,8 @@ html, body {
 .control-panel-container {
   margin: 24px 0 14px 0;
   min-height: 40px;
+  position: relative;
+  display: inline-block;
 }
 
 .control-panel-label-name {
@@ -100,6 +102,39 @@ html, body {
 .tester-icons {
   font-family: "Iconoteka Regular";
   font-size: 20px;
+}
+
+.tester-button {
+  cursor: pointer;
+}
+
+.tester-menu-panel {
+  background-color: var(--white);
+  left: -24px;
+  top: 40px;
+  border: 1px solid var(--lighter-gray);
+  min-width: 302px;
+  display: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.tester-menu-panel-show {
+  display:block;
+} 
+
+.tester-menu-panel-element {
+  margin:0;
+  padding: 14px 11px 14px 24px;
+}
+
+.tester-menu-panel-element:hover {
+  color: var(--gray2);
+}
+
+.tester-menu-panel-element-current {
+  color: var(--white);
+  background: var(--almost-darker);
 }
 
 .tester-line-separator {
