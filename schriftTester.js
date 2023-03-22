@@ -19,6 +19,8 @@ class TesterView {
   placeUIElements() {
     for (const elem in this.config) {
       switch (elem) {
+        case "fontFamily":
+          appendHeader(this.config[elem], this.controlPanel);
         case "fontSize":
         case "lineHeight":
         case "letterSpacing":
@@ -245,6 +247,42 @@ function appendDropdown(config, paramName, container, update) {
   container.appendChild(wrapper);
   
 }
+
+function appendHeader(familyName, container) {
+  log(`familyName: ${familyName}`)
+  var wrapper = document.createElement("div");
+  var familyNameLabel = document.createElement("div");
+  var familyNameLabelText = document.createTextNode(familyName);
+  var buttons = document.createElement("div");
+  var resetButton = document.createElement("div");
+  var resetButtonIcon = document.createTextNode("@replay");
+  var invertButton = document.createElement("div");
+  var invertButtonIcon = document.createTextNode("@invert");
+
+  wrapper.classList.add("tester-header");
+  buttons.classList.add("tester-header-buttons");
+  resetButton.classList.add("tester-icons");
+  resetButton.classList.add("tester-button");
+  invertButton.classList.add("tester-icons");
+  invertButton.classList.add("tester-button");
+
+  buttons.style.display = "flex";
+  buttons.style.flexDirection = "row";
+  buttons.style.flexWrap = "nowrap";
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = "row";
+  wrapper.style.justifyContent = "space-between";
+
+  familyNameLabel.appendChild(familyNameLabelText);
+  resetButton.appendChild(resetButtonIcon);
+  invertButton.appendChild(invertButtonIcon);
+  buttons.appendChild(resetButton);
+  buttons.appendChild(invertButton);
+  wrapper.appendChild(familyNameLabel);
+  wrapper.appendChild(buttons);
+  container.appendChild(wrapper);
+
+  }
 
 function appendSlider(sliderParams, container, update, propName) {
   var wrapper = document.createElement("div");
