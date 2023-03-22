@@ -66,16 +66,25 @@ class TesterView {
     switch (propName) {
       case "fontSize":
         this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
-      case "letterSpacing":
       case "lineHeight":
-        if (this.config[propName].units === '%') {
+      case "letterSpacing":
+        if (this.config["letterSpacing"].units === '%') {
           var units = this.config.fontSize.units;
-          var value = this.config.fontSize.value / 100 * this.config[propName].value;
+          var value = this.config.fontSize.value / 100 * this.config["letterSpacing"].value;
         } else {
-          var units = this.config[propName].units;
-          var value = this.config[propName].value;
+          var units = this.config["letterSpacing"].units;
+          var value = this.config["letterSpacing"].value;
         }
-        this.textSampleArea.style[propName] = value + units;
+        this.textSampleArea.style["letterSpacing"] = value + units;
+      case "lineHeight":
+        if (this.config["lineHeight"].units === '%') {
+          var units = this.config.fontSize.units;
+          var value = this.config.fontSize.value / 100 * this.config["lineHeight"].value;
+        } else {
+          var units = this.config["lineHeight"].units;
+          var value = this.config["lineHeight"].value;
+        }
+        this.textSampleArea.style["lineHeight"] = value + units;
         break;
       case "style":
         this.textSampleArea.style.fontFamily = this.config.fontFamily + " " + this.config.style.value
