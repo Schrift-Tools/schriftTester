@@ -130,7 +130,7 @@ class TesterConfig {
         case "alignment":
         case "case":
         case "style":
-          const optionsParams = parseOptionsParams(value);
+          const optionsParams = parseListParams(value);
           for (const [paramKey, paramValue] of Object.entries(optionsParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
@@ -397,13 +397,13 @@ function parseSliderParams(input) {
   }
 }
 
-function parseOptionsParams(input) {
-  const patternNamedOptionList = /^([a-zA-Z0-9_ ]+)?\s*\[(.+)\]$/;
-  const patternUnnamedOptionList = /^(.+?)(\*?)$/;
+function parseListParams(input) {
+  const patternNamedList = /^([a-zA-Z0-9_ ]+)?\s*\[(.+)\]$/;
+  const patternUnnamedList = /^(.+?)(\*?)$/;
   try {
     // Check if input matches named or unnamed pattern
-    const matchNamed = input.match(patternNamedOptionList);
-    const matchUnnamed = input.match(patternUnnamedOptionList);
+    const matchNamed = input.match(patternNamedList);
+    const matchUnnamed = input.match(patternUnnamedList);
 
     console.log("matchNamed", matchNamed)
     console.log("matchUnnamed", matchUnnamed)
