@@ -163,7 +163,12 @@ class TesterConfig {
           }
           }
           break;
-      } 
+        case "features":
+          this[key] = parseFeatures(value.trim())
+          log(`${key} => ${JSON.stringify(this[key])}`);
+          break;
+        
+        } 
       log(`\n`);
     } 
   }
@@ -462,6 +467,29 @@ function parseListParams(input) {
     return;
   }
 }
+
+function parseFeatures(input) {
+  const patternFeatureBlocks = /\s*\((?<label>[^|]*)\|(?<type>[^\s]*)\s*\[(?<tags>[^\]]*)\]\s*\)*?/g;
+  const patternFeaturesList  = /(?<label>[^\[|;]*)?\s*\|(?<tag>[^:\s]+)\s*:\s*(?<value>[^;\]]+);*\s*/g;
+  
+  try {
+
+    const features = [...input.matchAll(patternFeatureBlocks)].map((match) => ({
+      label: match.groups.label,
+      feature: match.groups.type,
+      value: [...match.groups.tags.matchAll(patternFeaturesList)].map((feature) => ({
+        label: feature.groups.label,
+        tag: feature.groups.tag,
+        value: feature.groups.value,}))
+    }));
+    return features;
+
+  } catch (error) {
+    console.error(`${error.message}`);
+    return;
+  }
+}
+
 
 let LOGGING_IS_ON = true;
 
