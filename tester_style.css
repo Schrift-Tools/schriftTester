@@ -199,6 +199,7 @@ html, body {
 .text-sample-area {
   margin: 0;
   padding: 64px 32px 32px 32px;
+  hyphens: auto;
 }
 
 .text-sample-area:focus {
