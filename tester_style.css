@@ -29,7 +29,7 @@ html, body {
 }
 
 .control-panel-container {
-  margin: 24px 0 14px 0;
+  margin: 39px 0 14px 0;
   min-height: 40px;
   position: relative;
   display: inline-block;
@@ -99,8 +99,47 @@ html, body {
   outline-offset: -1px;
 }
 
+.tester-feature-block {
+  margin: 39px 0 14px 0;
+}
+.tester-feature-block-label {
+  margin: 0 0 18px 0;
+  color: var(--gray2);
+}
+.tester-radio-button {
+  appearance: none;
+  border: 1px solid var(--light-gray);
+  background-color: var(--white);
+  height: 9px;
+  padding: 9px;
+  margin: 0 15px 0 5px;
+  border-radius: 10px;
+}
+.tester-checkbox {
+  appearance: none;
+  border: 1px solid var(--light-gray);
+  background-color: var(--white);
+  height: 8px;
+  padding: 8px;
+  margin: 0 17px 0 6px;
+}
+.tester-radio-button:checked,.tester-checkbox:checked {
+  border: 1px solid var(--almost-dark);
+  background-color: var(--almost-dark);
+}
+.tester-feature-tag {
+  margin: 8px 0 4px 0;
+}
+
+.tester-feature-tag-label {
+}
+
+.tester-feature-tag-code {
+  color: var(--gray2);
+}
+
 .tester-header {
-  margin: 0 0 40px 0
+  margin: 0 0 40px 0;
 }
 .tester-header-buttons {
   

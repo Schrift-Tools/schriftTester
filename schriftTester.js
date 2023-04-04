@@ -33,6 +33,10 @@ class TesterView {
             appendDropdown(this.config, elem, this.controlPanel, this.update.bind(this));
           };
         }
+        break;
+        case "features": {
+          appendFeatures(this.config, this.controlPanel, this.update.bind(this))
+        }
       }    
     }
   }
@@ -91,7 +95,16 @@ class TesterView {
       case "style":
         this.textSampleArea.style.fontFamily = this.config.fontFamily + " " + this.config.style.value
         break;
-
+      case "features":
+        var features = []
+        for (const featureBlock of this.config["features"]) {
+          features.push(Object.values(featureBlock.tags).map(t => `'${t.tag}' ${t.value}`).join(', '))
+        }
+        log(features.join(', '))
+        this.textSampleArea.style["fontFeatureSettings"] = features.join(', ');
+        console.log(this.config["features"])
+        break;
+        
     }
   }
 }
@@ -190,6 +203,85 @@ function initTesters() {
     testers.push(tester);
   });
   return testers;
+}
+
+// function appendRadio(config, container, update) {
+//   var wrapper = document.createElement("div");
+//   var label = document.createElement("div");
+//   var labelText = document.createTextNode(sliderParams.label);
+// }
+
+function appendFeatures(config, container, update) {
+  const features = config.features;
+  var wrapper = document.createElement("div");
+  
+  features.forEach((featureBlock, blockIndex) => {
+    var block = document.createElement("div");
+    var blockLabel = document.createElement("div");
+    var blockLabelText = document.createTextNode(featureBlock.label);
+    block.appendChild(blockLabel);
+    blockLabel.appendChild(blockLabelText);
+
+    block.classList.add("tester-feature-block");
+    blockLabel.classList.add("tester-feature-block-label");
+
+    featureBlock.tags.forEach((tag, featureIndex) => {
+      var tagElement = document.createElement("div");
+      var tagControl = document.createElement("div");
+      var tagInput = document.createElement("input");
+      var tagLabel = document.createElement("div");
+      var tagLabelText = document.createTextNode(tag.label);
+      var tagCode = document.createElement("div");
+      var tagCodeText = document.createTextNode(tag.tag);
+      
+      tagInput.type = featureBlock.type;
+      tagInput.name = featureBlock.label;
+      tagInput.checked = parseInt(tag.value);
+      tagInput.onchange = function () {
+        if (tagInput.checked) {
+          if (tagInput.type === "radio") {
+            config.features[blockIndex].tags.forEach((tag) => {
+              tag.value = 0;
+            });
+          }
+          config.features[blockIndex].tags[featureIndex].value = 1;
+      } else {
+          config.features[blockIndex].tags[featureIndex].value = 0;
+        };
+        update("features");
+        
+      };
+      log(`!!!${tag.label}, tag.value: ${tag.value}`)
+
+      tagControl.style.display = "flex";
+      tagControl.style.flexDirection = "row";
+      tagControl.style.flexWrap = "nowrap";
+      tagElement.style.display = "flex";
+      tagElement.style.flexDirection = "row";
+      tagElement.style.flexWrap = "nowrap";
+      tagElement.style.justifyContent = "space-between";
+
+      if (tagInput.type === "radio") {
+        tagInput.classList.add("tester-radio-button");
+      } else if (tagInput.type === "checkbox") {
+        tagInput.classList.add("tester-checkbox");
+      }
+      
+      tagElement.classList.add("tester-feature-tag");
+      tagLabel.classList.add("tester-feature-tag-label");
+      tagCode.classList.add("tester-feature-tag-code");
+
+      tagLabel.appendChild(tagLabelText);
+      tagCode.appendChild(tagCodeText);
+      tagControl.appendChild(tagInput);
+      tagControl.appendChild(tagLabel);
+      tagElement.appendChild(tagControl);
+      tagElement.appendChild(tagCode);
+      block.appendChild(tagElement);
+    });    
+    wrapper.appendChild(block);
+  })
+  container.appendChild(wrapper);
 }
 
 
@@ -476,8 +568,8 @@ function parseFeatures(input) {
 
     const features = [...input.matchAll(patternFeatureBlocks)].map((match) => ({
       label: match.groups.label,
-      feature: match.groups.type,
-      value: [...match.groups.tags.matchAll(patternFeaturesList)].map((feature) => ({
+      type: match.groups.type,
+      tags: [...match.groups.tags.matchAll(patternFeaturesList)].map((feature) => ({
         label: feature.groups.label,
         tag: feature.groups.tag,
         value: feature.groups.value,}))
