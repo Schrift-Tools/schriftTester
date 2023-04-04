@@ -454,6 +454,7 @@ function appendTextSampleArea(config, container) {
   if (config.editable) {
     textSampleArea.contentEditable = true;
   }
+  textSampleArea.spellcheck = false;
   textSampleArea.appendChild(textSample);
   textSampleArea.style.flexGrow = "1";
   textSampleArea.style.fontFamily = config.fontFamily + " " + config.style.value;
