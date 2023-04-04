@@ -143,6 +143,7 @@ html, body {
 }
 
 .tester-header {
+  font-family: "Struve Semibold";
   margin: 0 0 40px 0;
 }
 .tester-header-buttons {
