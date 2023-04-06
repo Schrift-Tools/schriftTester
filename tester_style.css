@@ -25,7 +25,13 @@ html, body {
   min-width: 319px;
   padding: 16px 32px 0 32px;
   border: 0 solid var(--lighter-gray);
+  overflow: auto;
+  max-height: 100vh;
+  scrollbar-width: none;
   /* border-color: var(--lighter-gray); */
+}
+.control-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .control-panel-container {
