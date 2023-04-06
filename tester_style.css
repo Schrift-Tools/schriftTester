@@ -19,9 +19,12 @@ html, body {
   box-sizing: border-box;
 }
 
-/* .tester {
-  
-} */
+.tester {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased; 
+}
 
 .control-panel {
   font-family: "Struve Regular";
