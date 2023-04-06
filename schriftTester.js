@@ -97,12 +97,21 @@ class TesterView {
         break;
       case "features":
         var features = []
+        var lang = '';
         for (const featureBlock of this.config["features"]) {
-          features.push(Object.values(featureBlock.tags).map(t => `'${t.tag}' ${t.value}`).join(', '))
+          for (const tag of Object.values(featureBlock.tags)) {
+            if (tag.tag === 'locl') {
+              if (tag.value == 1) {
+                this.textSampleArea.setAttribute('lang', tag.lang);
+                features.push(`'${tag.tag}' ${tag.value}`);
+              }
+            } else {
+              features.push(`'${tag.tag}' ${tag.value}`);
+            }
+          }
         }
-        log(features.join(', '))
         this.textSampleArea.style["fontFeatureSettings"] = features.join(', ');
-        console.log(this.config["features"])
+        
         break;
         
     }
@@ -204,12 +213,6 @@ function initTesters() {
   });
   return testers;
 }
-
-// function appendRadio(config, container, update) {
-//   var wrapper = document.createElement("div");
-//   var label = document.createElement("div");
-//   var labelText = document.createTextNode(sliderParams.label);
-// }
 
 function appendFeatures(config, container, update) {
   const features = config.features;
@@ -571,11 +574,17 @@ function parseFeatures(input) {
     const features = [...input.matchAll(patternFeatureBlocks)].map((match) => ({
       label: match.groups.label,
       type: match.groups.type,
-      tags: [...match.groups.tags.matchAll(patternFeaturesList)].map((feature) => ({
-        label: feature.groups.label,
-        tag: feature.groups.tag,
-        value: feature.groups.value,}))
+      tags: [...match.groups.tags.matchAll(patternFeaturesList)].map((feature) => {
+        const [tag, lang] = feature.groups.tag.split('-');
+        return {
+          label: feature.groups.label,
+          tag: tag,
+          lang: lang,
+          value: feature.groups.value
+        };
+      })
     }));
+    
     return features;
 
   } catch (error) {
