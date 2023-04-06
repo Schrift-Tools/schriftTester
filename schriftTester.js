@@ -452,6 +452,7 @@ function appendControlPanel(align, container) {
 }
 
 function appendTextSampleArea(config, container) {
+  var textSampleAreaContainer = document.createElement("div");
   var textSampleArea = document.createElement("div");
   var textSample = document.createTextNode(config.text);
   if (config.editable) {
@@ -459,12 +460,16 @@ function appendTextSampleArea(config, container) {
   }
   textSampleArea.spellcheck = false;
   textSampleArea.lang = 'en';
-  textSampleArea.appendChild(textSample);
+  
   textSampleArea.style.flexGrow = "1";
   textSampleArea.style.fontFamily = config.fontFamily + " " + config.style.value;
   textSampleArea.style.fontSize = config.fontSize.value + config.fontSize.units
+  textSampleAreaContainer.classList.add("text-sample-area-container");
   textSampleArea.classList.add("text-sample-area");
-  container.appendChild(textSampleArea);
+  
+  textSampleArea.appendChild(textSample);
+  textSampleAreaContainer.appendChild(textSampleArea);
+  container.appendChild(textSampleAreaContainer);
   return textSampleArea;
 }
 

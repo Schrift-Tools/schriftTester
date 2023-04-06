@@ -19,6 +19,10 @@ html, body {
   box-sizing: border-box;
 }
 
+/* .tester {
+  
+} */
+
 .control-panel {
   font-family: "Struve Regular";
   font-size: 16px;
@@ -203,10 +207,17 @@ html, body {
   border: none; 
 }
 
+.text-sample-area-container {
+  width: 100vw;
+  height: 100vh;
+  display: inline-block;
+  overflow: hidden;
+}
 .text-sample-area {
   margin: 0;
   padding: 64px 32px 32px 32px;
   hyphens: auto;
+  overflow: hidden;
 }
 
 .text-sample-area:focus {
