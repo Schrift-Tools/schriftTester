@@ -431,7 +431,7 @@ function appendHeader(familyName, container) {
   
     // Listen for keyup and input events to ensure value is updated immediately
     labelValue.addEventListener("keyup", () => {
-      sliderParams.value = parseFloat(labelValueText.nodeValue);
+      sliderParams.value = parseFloat(labelValueText.innerHTML);
       update(propName, sliderParams.value);
     });
     
