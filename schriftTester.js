@@ -328,7 +328,6 @@ function appendDropdown(config, paramName, container, update) {
   valuePicker.onclick = function () {
     menuPanel.classList.toggle("tester-menu-panel-show");
     for (const child of menuPanel.children) {
-      console.log(child.textContent, config[paramName].value, child.textContent === config[paramName].value)
       child.textContent === config[paramName].value ? child.classList.add("tester-menu-panel-element-current") : child.classList.remove("tester-menu-panel-element-current");
     }
   };
@@ -410,6 +409,13 @@ function appendHeader(familyName, container) {
     if (sliderParams.step) slider.step = sliderParams.step;
     
     labelValue.contentEditable = true;
+
+    labelValue.addEventListener("input", () => {
+      if (labelValue.innerHTML === "<br>") {
+        labelValue.innerHTML = sliderParams.min;
+      }
+    })
+
     labelValue.addEventListener("keydown", (event) => {
       if (
         (event.key >= 0 && event.key <= 9) ||
@@ -418,27 +424,26 @@ function appendHeader(familyName, container) {
         event.key === "Backspace" ||
         event.key === "ArrowLeft" ||
         event.key === "ArrowRight"
-      ) {
-        // Set a timeout to update the value after the key is processed
-        setTimeout(() => {
-          sliderParams.value = parseFloat(labelValue.innerHTML);
-          update(propName, sliderParams.value);
+        ) {
+          // Set a timeout to update the value after the key is processed
+          setTimeout(() => {
+            var value = parseFloat(labelValue.innerHTML);
+            if (isNaN(value)) {
+              value = sliderParams.min; 
+            }; 
+            sliderParams.value = value + "";
+            slider.value = value;
+            update(propName, sliderParams.value);
         }, 100);
       } else {
         event.preventDefault();
       }
     });
-  
-    // Listen for keyup and input events to ensure value is updated immediately
-    labelValue.addEventListener("keyup", () => {
-      sliderParams.value = parseFloat(labelValueText.innerHTML);
-      update(propName, sliderParams.value);
-    });
-    
+
   slider.oninput = () => {
-    labelValueText.nodeValue = slider.value
+    labelValue.innerHTML = slider.value;
     sliderParams.value = slider.value;
-    update(propName, sliderParams.value)
+    update(propName, sliderParams.value);
   }
 
   labels.style.display = "flex";
@@ -547,8 +552,6 @@ function parseListParams(input) {
     const matchNamed = input.match(patternNamedList);
     const matchUnnamed = input.match(patternUnnamedList);
 
-    console.log("matchNamed", matchNamed)
-    console.log("matchUnnamed", matchUnnamed)
     // If input is named
     if (matchNamed) {
       const label = matchNamed[1].trim(); // Extract label from input
