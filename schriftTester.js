@@ -384,30 +384,62 @@ function appendHeader(familyName, container) {
 
   }
 
-function appendSlider(sliderParams, container, update, propName) {
-  var wrapper = document.createElement("div");
-  var labels = document.createElement("div");
-  var labelName = document.createElement("div");
-  var labelValue = document.createElement("div");
-  var labelNameText = document.createTextNode(sliderParams.label);
-  var labelValueText = document.createTextNode(sliderParams.value + " " + sliderParams.unitsLabel);
-  var slider = document.createElement("input");
-
-  labelName.classList.add("control-panel-label-name");
-  labelValue.classList.add("control-panel-label-value");
-  slider.classList.add("control-panel-slider");
-  wrapper.classList.add("control-panel-container");
-  wrapper.style.flexDirection = "column";
-
-  slider.type = "range";
-  slider.min = sliderParams.min;
-  slider.max = sliderParams.max;
-  slider.value = sliderParams.value;
-
-  if (sliderParams.step) slider.step = sliderParams.step;
+  function appendSlider(sliderParams, container, update, propName) {
+    var wrapper = document.createElement("div");
+    var labels = document.createElement("div");
+    var labelSlider = document.createElement("div");
+    var labelSliderText = document.createTextNode(sliderParams.label);
+    
+    var labelValueUnits = document.createElement("div");
+    var labelValue = document.createElement("div");
+    var labelValueText = document.createTextNode(sliderParams.value);
+    var labelUnits = document.createElement("div");
+    var labelUnitsText = document.createTextNode(sliderParams.unitsLabel);
+    
+    var slider = document.createElement("input");
+    
+    labelSlider.classList.add("control-panel-label-name");
+    labelValue.classList.add("control-panel-label-value");
+    labelUnits.classList.add("control-panel-label-units");
+    slider.classList.add("control-panel-slider");
+    wrapper.classList.add("control-panel-container");
+    wrapper.style.flexDirection = "column";
+    
+    slider.type = "range";
+    slider.min = sliderParams.min;
+    slider.max = sliderParams.max;
+    slider.value = sliderParams.value;
+    
+    if (sliderParams.step) slider.step = sliderParams.step;
+    
+    labelValue.contentEditable = true;
+    labelValue.addEventListener("keydown", (event) => {
+      if (
+        (event.key >= 0 && event.key <= 9) ||
+        event.key === "." ||
+        event.key === "-" ||
+        event.key === "Backspace" ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight"
+      ) {
+        // Set a timeout to update the value after the key is processed
+        setTimeout(() => {
+          sliderParams.value = parseFloat(labelValueText.textContent);
+          update(propName, sliderParams.value);
+        }, 0);
+      } else {
+        event.preventDefault();
+      }
+    });
   
+    // Listen for keyup and input events to ensure value is updated immediately
+    labelValue.addEventListener("keyup", () => {
+      sliderParams.value = parseFloat(labelValueText.textContent);
+      update(propName, sliderParams.value);
+    });
+    
   slider.oninput = () => {
-    labelValueText.nodeValue = slider.value + " " + sliderParams.unitsLabel;
+    labelValueText.nodeValue = slider.value
     sliderParams.value = slider.value;
     update(propName, sliderParams.value)
   }
@@ -416,13 +448,19 @@ function appendSlider(sliderParams, container, update, propName) {
   labels.style.flexDirection = "row";
   labels.style.flexWrap = "nowrap";
   labels.style.justifyContent = "space-between";
+  labelValueUnits.style.display = "flex";
+  labelValueUnits.style.flexDirection = "row";
+  labelValueUnits.style.flexWrap = "nowrap";
   wrapper.style.display = "flex";
   wrapper.style.flexDirection = "column";
 
-  labelName.appendChild(labelNameText);
+  labelSlider.appendChild(labelSliderText);
   labelValue.appendChild(labelValueText);
-  labels.appendChild(labelName);
-  labels.appendChild(labelValue);
+  labelUnits.appendChild(labelUnitsText);
+  labels.appendChild(labelSlider);
+  labelValueUnits.appendChild(labelValue);
+  labelValueUnits.appendChild(labelUnits);
+  labels.appendChild(labelValueUnits);
   wrapper.appendChild(labels);
   wrapper.appendChild(slider);
   container.appendChild(wrapper);
@@ -596,6 +634,36 @@ function parseFeatures(input) {
     console.error(`${error.message}`);
     return;
   }
+}
+
+function setInputFilter(textbox, inputFilter, errMsg) {
+  [ "input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop", "focusout" ].forEach(function(event) {
+    textbox.addEventListener(event, function(e) {
+      if (inputFilter(this.value)) {
+        // Accepted value.
+        if ([ "keydown", "mousedown", "focusout" ].indexOf(e.type) >= 0){
+          this.classList.remove("input-error");
+          this.setCustomValidity("");
+        }
+
+        this.oldValue = this.value;
+        this.oldSelectionStart = this.selectionStart;
+        this.oldSelectionEnd = this.selectionEnd;
+      }
+      else if (this.hasOwnProperty("oldValue")) {
+        // Rejected value: restore the previous one.
+        this.classList.add("input-error");
+        this.setCustomValidity(errMsg);
+        this.reportValidity();
+        this.value = this.oldValue;
+        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+      }
+      else {
+        // Rejected value: nothing to restore.
+        this.value = "";
+      }
+    });
+  });
 }
 
 

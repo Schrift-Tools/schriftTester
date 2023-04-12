@@ -49,6 +49,15 @@
   color: var(--almost-dark);
 }
 
+.control-panel-label-value:focus {
+  outline: 0px solid transparent;
+}
+
+.control-panel-label-units {
+  margin-left: 0.2em;
+  color: var(--almost-dark);
+}
+
 .control-panel-slider {
   margin: 4px 0 0 0;
   border: 0px solid white;
