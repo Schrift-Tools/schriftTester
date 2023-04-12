@@ -96,8 +96,7 @@ class TesterView {
         this.textSampleArea.style.fontFamily = this.config.fontFamily + " " + this.config.style.value
         break;
       case "features":
-        var features = []
-        var lang = '';
+        var features = [];
         for (const featureBlock of this.config["features"]) {
           for (const tag of Object.values(featureBlock.tags)) {
             if (tag.tag === 'locl') {
@@ -111,9 +110,7 @@ class TesterView {
           }
         }
         this.textSampleArea.style["fontFeatureSettings"] = features.join(', ');
-        
         break;
-        
     }
   }
 }
