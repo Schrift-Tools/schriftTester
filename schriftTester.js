@@ -421,7 +421,7 @@ function appendHeader(familyName, container) {
       ) {
         // Set a timeout to update the value after the key is processed
         setTimeout(() => {
-          sliderParams.value = parseFloat(labelValueText.textContent);
+          sliderParams.value = parseFloat(labelValue.innerHTML);
           update(propName, sliderParams.value);
         }, 0);
       } else {
@@ -431,7 +431,7 @@ function appendHeader(familyName, container) {
   
     // Listen for keyup and input events to ensure value is updated immediately
     labelValue.addEventListener("keyup", () => {
-      sliderParams.value = parseFloat(labelValueText.textContent);
+      sliderParams.value = parseFloat(labelValueText.nodeValue);
       update(propName, sliderParams.value);
     });
     
