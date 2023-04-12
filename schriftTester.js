@@ -423,7 +423,7 @@ function appendHeader(familyName, container) {
         setTimeout(() => {
           sliderParams.value = parseFloat(labelValue.innerHTML);
           update(propName, sliderParams.value);
-        }, 0);
+        }, 100);
       } else {
         event.preventDefault();
       }
