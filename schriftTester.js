@@ -73,10 +73,7 @@ class TesterView {
         typeof this.config[propName] === "object" &&
         "default" in this.config[propName]
       ) {
-        console.log(propName)
-        console.log("before", this.config[propName].value)
         this.config[propName].value = this.config[propName].default;
-        console.log("after", this.config[propName].value, "\n")
         this.update(propName);
         this.updateView(propName)
       }
@@ -90,6 +87,7 @@ class TesterView {
             this.config[propName][subPropName].tags[tag].default;
           }
           this.update(propName);
+          this.updateView(propName)
         }
       }
     }
@@ -97,6 +95,12 @@ class TesterView {
   updateView(propName) {
     if (propName in this.controlPanel){
       this.controlPanel[propName].value = this.config[propName].default;
+    }
+    if (propName === "features"){
+      this.config.features.forEach((_, blockIndex) => {
+        this.config.features[blockIndex].tags.forEach((_, featureIndex) => {
+          this.controlPanel.features[blockIndex][featureIndex].value = this.config.features[blockIndex].tags[featureIndex].default;
+        })})
     }
   }
   update(propName) {
@@ -244,10 +248,12 @@ function initTesters() {
 }
 
 function appendFeatures(config, controlPanel, update) {
+  controlPanel['features'] = []
   const features = config.features;
   var wrapper = document.createElement("div");
   
   features.forEach((featureBlock, blockIndex) => {
+    controlPanel['features'].push([])
     var block = document.createElement("div");
     var blockLabel = document.createElement("div");
     var blockLabelText = document.createTextNode(featureBlock.label);
@@ -258,6 +264,7 @@ function appendFeatures(config, controlPanel, update) {
     blockLabel.classList.add("tester-feature-block-label");
 
     featureBlock.tags.forEach((tag, featureIndex) => {
+      controlPanel['features'][blockIndex].push([])
       var tagElement = document.createElement("div");
       var tagControl = document.createElement("div");
       var tagInput = document.createElement("input");
@@ -283,6 +290,12 @@ function appendFeatures(config, controlPanel, update) {
         update("features");
         
       };
+      Object.defineProperty(controlPanel["features"][blockIndex][featureIndex], "value", {
+        set: function(newValue) {
+          tagInput.checked = parseInt(newValue);
+        },
+        configurable: true 
+      });
       log(`!!!${tag.label}, tag.value: ${tag.value}`)
 
       tagControl.style.display = "flex";
