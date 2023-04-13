@@ -20,7 +20,7 @@ class TesterView {
     for (const elem in this.config) {
       switch (elem) {
         case "fontFamily":
-          appendHeader(this.config[elem], this.controlPanel);
+          appendHeader(this.config[elem], this.controlPanel, this.reset.bind(this));
         case "fontSize":
         case "lineHeight":
         case "letterSpacing":
@@ -67,6 +67,15 @@ class TesterView {
     }
   }
 
+  reset() {
+    for (const option in this.config) {
+      if (typeof this.config[option] === "object" && "default" in this.config[option]) {
+        console.log(`${option} has ddefauult`);
+        this.config[option].value = this.config[option].default;
+        this.update(option);
+      };
+    }
+  }
   update(propName) {
     log(`updating ${propName}...`)
     switch (propName) {
@@ -122,12 +131,12 @@ class TesterConfig {
     this.controlPlacement = { panel: 'left' };
     this.labelFont = null;
     this.fontFamily = null;
-    this.style = { label: "Style", value: "Regular", options: ["Regular"], visible: true, };
-    this.fontSize = { label: "Size", value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
-    this.lineHeight = { label: "Leading", value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
-    this.letterSpacing = { label: "Tracking", value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
-    this.alignment = { label: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
-    this.case = { label: "Case", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
+    this.style = { label: "Style", default: "Regular", value: "Regular", options: ["Regular"], visible: true, };
+    this.fontSize = { label: "Size", default: 80, value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
+    this.lineHeight = { label: "Leading", default: 100, value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
+    this.letterSpacing = { label: "Tracking", default: 0, value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
+    this.alignment = { label: "Left", default: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
+    this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
     this.features = {};
     this.variations = {};
     this.text = "";
@@ -344,7 +353,7 @@ function appendDropdown(config, paramName, container, update) {
   
 }
 
-function appendHeader(familyName, container) {
+function appendHeader(familyName, container, reset) {
   log(`familyName: ${familyName}`)
   var wrapper = document.createElement("div");
   var familyNameLabel = document.createElement("div");
@@ -354,6 +363,10 @@ function appendHeader(familyName, container) {
   var resetButtonIcon = document.createTextNode("@replay");
   var invertButton = document.createElement("div");
   var invertButtonIcon = document.createTextNode("@invert");
+
+  resetButton.onclick = function () {
+    reset();
+  };
 
   wrapper.classList.add("tester-header");
   buttons.classList.add("tester-header-buttons");
@@ -567,7 +580,7 @@ function parseListParams(input) {
           : options[0]; // Extract default value from options
           const optionsOptions = options.map((option) => !option.endsWith("*")); // Extract options options from options
           // const optionsOptions = options.filter((option) => !option.endsWith("*")); // Extract options options from options
-          return { label: label, value: defaultValue, options: optionsOptions };
+          return { label: label, default: defaultValue, value: defaultValue, options: optionsOptions };
 
       // If input is unnamed
     } else if (matchUnnamed) {
@@ -593,12 +606,12 @@ function parseListParams(input) {
         // If there is a default value, but only one option
       } else if (hasDefault) {
         const value = optionsString; // Extract default value
-        return { label: label, value: value, options: undefined };
+        return { label: label, default: value, value: value, options: undefined };
 
         // If there is no default value and only one option
       } else {
         const value = optionsString; // Extract value
-        return { label, value, options: undefined };
+        return { label, default: value, value: value, options: undefined };
       }
     }
     throw new Error(`Invalid option list params string: ${input}`);
@@ -623,6 +636,7 @@ function parseFeatures(input) {
           label: feature.groups.label,
           tag: tag,
           lang: lang,
+          default: feature.groups.value,
           value: feature.groups.value
         };
       })
@@ -634,36 +648,6 @@ function parseFeatures(input) {
     console.error(`${error.message}`);
     return;
   }
-}
-
-function setInputFilter(textbox, inputFilter, errMsg) {
-  [ "input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop", "focusout" ].forEach(function(event) {
-    textbox.addEventListener(event, function(e) {
-      if (inputFilter(this.value)) {
-        // Accepted value.
-        if ([ "keydown", "mousedown", "focusout" ].indexOf(e.type) >= 0){
-          this.classList.remove("input-error");
-          this.setCustomValidity("");
-        }
-
-        this.oldValue = this.value;
-        this.oldSelectionStart = this.selectionStart;
-        this.oldSelectionEnd = this.selectionEnd;
-      }
-      else if (this.hasOwnProperty("oldValue")) {
-        // Rejected value: restore the previous one.
-        this.classList.add("input-error");
-        this.setCustomValidity(errMsg);
-        this.reportValidity();
-        this.value = this.oldValue;
-        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-      }
-      else {
-        // Rejected value: nothing to restore.
-        this.value = "";
-      }
-    });
-  });
 }
 
 
