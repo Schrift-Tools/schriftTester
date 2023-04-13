@@ -1,14 +1,14 @@
 // Define a view class for the type tester widget
 class TesterView {
   constructor(config, container) {
-    this.config = config
-    this.container = container
+    this.config = config;
+    this.container = container;
     this.controlPanel = appendControlPanel(config.controlPlacement, container);
     this.textSampleArea = appendTextSampleArea(config, container);
-    this.init()
+    this.init();
   }
-  
-  init(){
+
+  init() {
     this.setContainerStyle();
     this.placeUIElements();
     for (const option in this.config) {
@@ -37,7 +37,7 @@ class TesterView {
         case "features": {
           appendFeatures(this.config, this.controlPanel, this.update.bind(this))
         }
-      }    
+      }
     }
   }
 
@@ -53,12 +53,12 @@ class TesterView {
         this.container.style.height = "100vh";
         break;
       case "left":
-      this.container.style.justifyContent = "space-between";
-      this.container.style.flexDirection = "row";
+        this.container.style.justifyContent = "space-between";
+        this.container.style.flexDirection = "row";
         break;
       case "right":
-      this.container.style.justifyContent = "space-between";
-      this.container.style.flexDirection = "row-reverse";
+        this.container.style.justifyContent = "space-between";
+        this.container.style.flexDirection = "row-reverse";
         break;
       default:
         // Default placement is left
@@ -68,22 +68,40 @@ class TesterView {
   }
 
   reset() {
-    for (const option in this.config) {
-      if (typeof this.config[option] === "object" && "default" in this.config[option]) {
-        console.log(`${option} has ddefauult`);
-        this.config[option].value = this.config[option].default;
-        this.update(option);
-      };
+    for (const propName in this.config) {
+      if (
+        typeof this.config[propName] === "object" &&
+        "default" in this.config[propName]
+      ) {
+        console.log(propName)
+        console.log("before", this.config[propName].value)
+        this.config[propName].value = this.config[propName].default;
+        console.log("after", this.config[propName].value, "\n")
+        this.update(propName);
+      }
+      for (const subPropName in this.config[propName]) {
+        if (
+          typeof this.config[propName][subPropName] === "object" &&
+          "tags" in this.config[propName][subPropName]
+        ) {
+          for (const tag in this.config[propName][subPropName].tags) {
+            this.config[propName][subPropName].tags[tag].value =
+            this.config[propName][subPropName].tags[tag].default;
+          }
+          this.update(propName);
+        }
+      }
+      
     }
   }
   update(propName) {
-    log(`updating ${propName}...`)
+    log(`updating ${propName}...`);
     switch (propName) {
       case "fontSize":
         this.textSampleArea.style[propName] = this.config[propName].value + this.config[propName].units;
       case "lineHeight":
       case "letterSpacing":
-        if (this.config["letterSpacing"].units === '%') {
+        if (this.config["letterSpacing"].units === "%") {
           var units = this.config.fontSize.units;
           var value = this.config.fontSize.value / 100 * this.config["letterSpacing"].value;
         } else {
@@ -92,7 +110,7 @@ class TesterView {
         }
         this.textSampleArea.style["letterSpacing"] = value + units;
       case "lineHeight":
-        if (this.config["lineHeight"].units === '%') {
+        if (this.config["lineHeight"].units === "%") {
           var units = this.config.fontSize.units;
           var value = this.config.fontSize.value / 100 * this.config["lineHeight"].value;
         } else {
@@ -108,9 +126,9 @@ class TesterView {
         var features = [];
         for (const featureBlock of this.config["features"]) {
           for (const tag of Object.values(featureBlock.tags)) {
-            if (tag.tag === 'locl') {
+            if (tag.tag === "locl") {
               if (tag.value == 1) {
-                this.textSampleArea.setAttribute('lang', tag.lang);
+                this.textSampleArea.setAttribute("lang", tag.lang);
                 features.push(`'${tag.tag}' ${tag.value}`);
               }
             } else {
@@ -118,7 +136,7 @@ class TesterView {
             }
           }
         }
-        this.textSampleArea.style["fontFeatureSettings"] = features.join(', ');
+        this.textSampleArea.style["fontFeatureSettings"] = features.join(", ");
         break;
     }
   }
@@ -536,17 +554,22 @@ function parseSliderParams(input) {
   const patternNumber = /^\s?(?<label>[^\p{N}][\p{L}\p{P}\p{N}\p{Zs}\p{Emoji}]*?)?\s*(?<value>-?\d+(\.\d+)?)(?:\s*(?<unitsLabel>[^\p{N}][\p{L}\p{P}\p{N}\p{Zs}\p{Emoji}]+?)\s*(?:=|\|\s?)\s*)?(?<units>[a-zA-Z% ]+?)?\s?$/u;
   try {
     const matchSliderRange = input.match(patternSliderRange);
+    if (matchSliderRange.groups.value) {
+      matchSliderRange.groups.default = matchSliderRange.groups.value;
+    }
     if (matchSliderRange) {
       return matchSliderRange.groups;
     }
 
     const matchNumber = input.match(patternNumber);
     if (matchNumber) {
-      var [_, label, value] = matchNumber;
+      var [_, label, value, units] = matchNumber;
       if (label) label = label.trim();
       return {
         label: label,
         value: parseFloat(value),
+        default: parseFloat(value),
+        units: units,
       };
     }
 
@@ -651,7 +674,7 @@ function parseFeatures(input) {
 }
 
 
-let LOGGING_IS_ON = true;
+let LOGGING_IS_ON = false;
 
 function log(message) {
   if (LOGGING_IS_ON) {console.log(message)};
