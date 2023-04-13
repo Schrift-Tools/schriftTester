@@ -3,7 +3,7 @@ class TesterView {
   constructor(config, container) {
     this.config = config;
     this.container = container;
-    this.controlPanel = appendControlPanel(config.controlPlacement, container);
+    this.controlPanel = newControlPanel(config.controlPlacement, container);
     this.textSampleArea = appendTextSampleArea(config, container);
     this.init();
   }
@@ -78,6 +78,7 @@ class TesterView {
         this.config[propName].value = this.config[propName].default;
         console.log("after", this.config[propName].value, "\n")
         this.update(propName);
+        this.updateView(propName)
       }
       for (const subPropName in this.config[propName]) {
         if (
@@ -91,7 +92,11 @@ class TesterView {
           this.update(propName);
         }
       }
-      
+    }
+  }
+  updateView(propName) {
+    if (propName in this.controlPanel){
+      this.controlPanel[propName].value = this.config[propName].default;
     }
   }
   update(propName) {
@@ -238,7 +243,7 @@ function initTesters() {
   return testers;
 }
 
-function appendFeatures(config, container, update) {
+function appendFeatures(config, controlPanel, update) {
   const features = config.features;
   var wrapper = document.createElement("div");
   
@@ -308,12 +313,13 @@ function appendFeatures(config, container, update) {
     });    
     wrapper.appendChild(block);
   })
-  container.appendChild(wrapper);
+  controlPanel.container.appendChild(wrapper);
 }
 
 
-function appendDropdown(config, paramName, container, update) {
-  let dropdownParams = config[paramName]
+function appendDropdown(config, propName, controlPanel, update) {
+  controlPanel[propName] = {};
+  let dropdownParams = config[propName];
   var wrapper = document.createElement("div");
   var valuePicker = document.createElement("div");
   var currentValue = document.createElement("div");
@@ -332,10 +338,10 @@ function appendDropdown(config, paramName, container, update) {
     
     menuPanel.appendChild(menuElement);
     menuElement.onclick = function () {
-      config[paramName].value = option;
+      config[propName].value = option;
       currentValueText.nodeValue = option;
       menuPanel.classList.toggle("tester-menu-panel-show");
-      update(paramName);
+      update(propName);
     };
   }
 
@@ -355,10 +361,16 @@ function appendDropdown(config, paramName, container, update) {
   valuePicker.onclick = function () {
     menuPanel.classList.toggle("tester-menu-panel-show");
     for (const child of menuPanel.children) {
-      child.textContent === config[paramName].value ? child.classList.add("tester-menu-panel-element-current") : child.classList.remove("tester-menu-panel-element-current");
+      child.textContent === config[propName].value ? child.classList.add("tester-menu-panel-element-current") : child.classList.remove("tester-menu-panel-element-current");
     }
   };
 
+  Object.defineProperty(controlPanel[propName], "value", {
+    set: function(newValue) {
+      currentValueText.nodeValue = newValue;
+    },
+    configurable: true 
+  });
 
   currentValue.appendChild(currentValueText);
   downButton.appendChild(downButtonIcon);
@@ -367,11 +379,11 @@ function appendDropdown(config, paramName, container, update) {
   wrapper.appendChild(valuePicker);
   wrapper.appendChild(line);
   wrapper.appendChild(menuPanel);
-  container.appendChild(wrapper);
+  controlPanel.container.appendChild(wrapper);
   
 }
 
-function appendHeader(familyName, container, reset) {
+function appendHeader(familyName, controlPanel, reset) {
   log(`familyName: ${familyName}`)
   var wrapper = document.createElement("div");
   var familyNameLabel = document.createElement("div");
@@ -407,11 +419,12 @@ function appendHeader(familyName, container, reset) {
   buttons.appendChild(invertButton);
   wrapper.appendChild(familyNameLabel);
   wrapper.appendChild(buttons);
-  container.appendChild(wrapper);
+  controlPanel.container.appendChild(wrapper);
 
   }
 
-  function appendSlider(sliderParams, container, update, propName) {
+  function appendSlider(sliderParams, controlPanel, update, propName) {
+    controlPanel[propName] = {};
     var wrapper = document.createElement("div");
     var labels = document.createElement("div");
     var labelSlider = document.createElement("div");
@@ -477,6 +490,14 @@ function appendHeader(familyName, container, reset) {
     update(propName, sliderParams.value);
   }
 
+  Object.defineProperty(controlPanel[propName], "value", {
+    set: function(newValue) {
+      labelValue.innerHTML = newValue;
+      slider.value = newValue;
+    },
+    configurable: true 
+  });
+
   labels.style.display = "flex";
   labels.style.flexDirection = "row";
   labels.style.flexWrap = "nowrap";
@@ -496,29 +517,30 @@ function appendHeader(familyName, container, reset) {
   labels.appendChild(labelValueUnits);
   wrapper.appendChild(labels);
   wrapper.appendChild(slider);
-  container.appendChild(wrapper);
+  controlPanel.container.appendChild(wrapper);
+
 }
 
-function appendControlPanel(align, container) {
-  var controlPanel = document.createElement("div");
-  controlPanel.classList.add("control-panel");
+function newControlPanel(align, container) {
+  var controlPanel = {container: document.createElement("div")};
+  controlPanel.container.classList.add("control-panel");
   switch (align){
     case "left":
-      controlPanel.style.borderWidth = "0 1px 0 0";
-      controlPanel.style.minHeight = "100vh";
+      controlPanel.container.style.borderWidth = "0 1px 0 0";
+      controlPanel.container.style.minHeight = "100vh";
       break;
     case "right":
-      controlPanel.style.borderWidth = " 0 0 0 1px";
-      controlPanel.style.minHeight = "100vh";
+      controlPanel.container.style.borderWidth = " 0 0 0 1px";
+      controlPanel.container.style.minHeight = "100vh";
       break;
     case "top":
-      controlPanel.style.borderWidth = "1px 0 0 0";
+      controlPanel.container.style.borderWidth = "1px 0 0 0";
       break;
     case "bottom":
-      controlPanel.style.borderWidth = "1px 0 0 0";
+      controlPanel.container.style.borderWidth = "1px 0 0 0";
       break;
 }
-  container.appendChild(controlPanel);
+  container.appendChild(controlPanel.container);
   return controlPanel;
 }
 
