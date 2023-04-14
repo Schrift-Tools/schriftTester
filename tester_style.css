@@ -19,6 +19,26 @@
   --features-hover: #3F4042;
   }
 
+[data-theme="invert"] {
+    --background-main: #1A1B1C;
+    --background-hover: #303133;
+    --background-inverse: #FFFFFF;
+    --text-input: #FFFFFF;
+    --text-body: #FFFFFF;
+    --text-muted: #A8ABB2;
+    --text-inverse: #303133;
+    --stroke-light: #3F4042;
+    --stroke-normal: #3F4042;
+    --stroke-hover: #D5DBE5;
+    --icons-normal: #E6E9F0;
+    --icons-muted: #A8ABB2;
+    --icons-hover: #F56325;
+    --slider-normal: #E6E9F0;
+    --slider-pressing: #F56325;
+    --features-active: #E6E9F0;
+    --features-inactive: #3F4042;
+    --features-hover: #F2F4F7;
+}
 
 * {
   box-sizing: border-box;
@@ -29,6 +49,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   -o-font-smoothing: antialiased; 
+  background: var(--background-main);
 }
 
 .control-panel {
@@ -73,6 +94,7 @@
 .control-panel-slider {
   margin: 4px 0 0 0;
   border: 0px solid var(--background-main);
+  background: var(--background-main);
 }
 
 .control-panel-slider{
@@ -122,7 +144,7 @@
 
 /*hide the outline behind the border*/
 .control-panel-slider:-moz-focusring {
-  outline: 1px solid white;
+  outline: 1px solid var(--background-main);
   outline-offset: -1px;
 }
 
@@ -163,6 +185,7 @@
 }
 
 .tester-feature-tag-label {
+  color: var(--text-body);
 }
 
 .tester-feature-tag-code {
@@ -170,6 +193,7 @@
 }
 
 .tester-header {
+  color: var(--text-body);
   font-family: "Struve Semibold";
   margin: 0 0 40px 0;
 }
@@ -178,6 +202,7 @@
 }
 
 .tester-icons {
+  color: var(--icons-normal);
   font-family: "Iconoteka Regular";
   font-variation-settings: 'wght' 320;
   font-size: 22px;
@@ -189,6 +214,7 @@
 }
 
 .tester-menu-panel {
+  color: var(--text-body);
   background-color: var(--background-main);
   left: -24px;
   top: 40px;
@@ -197,6 +223,10 @@
   display: none;
   position: absolute;
   z-index: 1;
+}
+
+.tester-menu-panel-closed-current {
+  color: var(--text-body);
 }
 
 .tester-menu-panel-show {
@@ -231,6 +261,7 @@
   overflow: hidden;
 }
 .text-sample-area {
+  color: var(--text-input);
   margin: 0;
   padding: 64px 32px 32px 32px;
   hyphens: auto;

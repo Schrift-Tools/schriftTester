@@ -20,7 +20,7 @@ class TesterView {
     for (const elem in this.config) {
       switch (elem) {
         case "fontFamily":
-          appendHeader(this.config[elem], this.controlPanel, this.reset.bind(this));
+          appendHeader(this.config[elem], this.controlPanel, this.reset.bind(this), this.invert.bind(this));
         case "fontSize":
         case "lineHeight":
         case "letterSpacing":
@@ -92,6 +92,16 @@ class TesterView {
       }
     }
   }
+
+
+  invert() {
+    if (this.container.getAttribute('data-theme')) {
+      this.container.removeAttribute('data-theme');
+    } else {
+    this.container.setAttribute('data-theme', 'invert');
+  }
+  }
+
   updateView(propName) {
     if (propName in this.controlPanel){
       this.controlPanel[propName].value = this.config[propName].default;
@@ -362,6 +372,7 @@ function appendDropdown(config, propName, controlPanel, update) {
   valuePicker.classList.add("tester-button");
   line.classList.add("tester-line-separator");
   menuPanel.classList.add("tester-menu-panel");
+  currentValue.classList.add("tester-menu-panel-closed-current");
   wrapper.classList.add("control-panel-container");
   
   valuePicker.style.display = "flex";
@@ -396,7 +407,7 @@ function appendDropdown(config, propName, controlPanel, update) {
   
 }
 
-function appendHeader(familyName, controlPanel, reset) {
+function appendHeader(familyName, controlPanel, reset, invert) {
   log(`familyName: ${familyName}`)
   var wrapper = document.createElement("div");
   var familyNameLabel = document.createElement("div");
@@ -409,6 +420,10 @@ function appendHeader(familyName, controlPanel, reset) {
 
   resetButton.onclick = function () {
     reset();
+  };
+  
+  invertButton.onclick = function () {
+    invert();
   };
 
   wrapper.classList.add("tester-header");
