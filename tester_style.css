@@ -20,24 +20,24 @@
   }
 
 [data-theme="invert"] {
-    --background-main: #1A1B1C;
-    --background-hover: #303133;
-    --background-inverse: #FFFFFF;
-    --text-input: #FFFFFF;
-    --text-body: #FFFFFF;
-    --text-muted: #A8ABB2;
-    --text-inverse: #303133;
-    --stroke-light: #3F4042;
-    --stroke-normal: #3F4042;
-    --stroke-hover: #D5DBE5;
-    --icons-normal: #E6E9F0;
-    --icons-muted: #A8ABB2;
-    --icons-hover: #F56325;
-    --slider-normal: #E6E9F0;
-    --slider-pressing: #F56325;
-    --features-active: #E6E9F0;
-    --features-inactive: #3F4042;
-    --features-hover: #F2F4F7;
+  --background-main: #1A1B1C;
+  --background-hover: #303133;
+  --background-inverse: #FFFFFF;
+  --text-input: #FFFFFF;
+  --text-body: #FFFFFF;
+  --text-muted: #A8ABB2;
+  --text-inverse: #303133;
+  --stroke-light: #3F4042;
+  --stroke-normal: #3F4042;
+  --stroke-hover: #D5DBE5;
+  --icons-normal: #E6E9F0;
+  --icons-muted: #A8ABB2;
+  --icons-hover: #F56325;
+  --slider-normal: #E6E9F0;
+  --slider-pressing: #F56325;
+  --features-active: #E6E9F0;
+  --features-inactive: #3F4042;
+  --features-hover: #F2F4F7;
 }
 
 * {
