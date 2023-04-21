@@ -21,6 +21,14 @@ class TesterView {
       switch (elem) {
         case "fontFamily":
           appendHeader(this.config[elem], this.controlPanel, this.reset.bind(this), this.invert.bind(this));
+          break;        
+        case "variations":
+          for (const axis in this.config[elem]) {
+            log('!!!!!variations!!!!!')
+            log(this.config[elem][axis])
+            appendSlider(this.config[elem][axis], this.controlPanel, this.update.bind(this), elem);
+          };
+          break;
         case "fontSize":
         case "lineHeight":
         case "letterSpacing":
@@ -157,6 +165,12 @@ class TesterView {
         }
         this.textSampleArea.style["fontFeatureSettings"] = features.join(", ");
         break;
+      case "variations":
+        const variations = []
+        for (const axis of this.config[propName]) {
+          variations.push("'"+axis.axis+"'" + " " + axis.value);
+        }
+        this.textSampleArea.style["fontVariationSettings"] = variations.join(", ");
     }
   }
 }
@@ -169,13 +183,13 @@ class TesterConfig {
     this.labelFont = null;
     this.fontFamily = null;
     this.style = { label: "Style", default: "Regular", value: "Regular", options: ["Regular"], visible: true, };
+    this.variations = {};
     this.fontSize = { label: "Size", default: 80, value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
     this.lineHeight = { label: "Leading", default: 100, value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.letterSpacing = { label: "Tracking", default: 0, value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.alignment = { label: "Left", default: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
     this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
     this.features = {};
-    this.variations = {};
     this.text = "";
     this.editable = true;
     this.init()
@@ -230,6 +244,10 @@ class TesterConfig {
           break;
         case "features":
           this[key] = parseFeatures(value.trim())
+          log(`${key} => ${JSON.stringify(this[key])}`);
+          break;
+        case "variations":
+          this[key] = parseVariations(value.trim())
           log(`${key} => ${JSON.stringify(this[key])}`);
           break;
         
@@ -461,14 +479,18 @@ function appendHeader(familyName, controlPanel, reset, invert) {
     var labelValueUnits = document.createElement("div");
     var labelValue = document.createElement("div");
     var labelValueText = document.createTextNode(sliderParams.value);
-    var labelUnits = document.createElement("div");
-    var labelUnitsText = document.createTextNode(sliderParams.unitsLabel);
+    if ('units' in sliderParams) {
+      var labelUnits = document.createElement("div");
+      var labelUnitsText = document.createTextNode(sliderParams.unitsLabel);  
+    }
     
     var slider = document.createElement("input");
     
     labelSlider.classList.add("control-panel-label-name");
     labelValue.classList.add("control-panel-label-value");
-    labelUnits.classList.add("control-panel-label-units");
+    if ('units' in sliderParams) {
+      labelUnits.classList.add("control-panel-label-units");
+    }
     slider.classList.add("control-panel-slider");
     wrapper.classList.add("control-panel-container");
     wrapper.style.flexDirection = "column";
@@ -530,18 +552,22 @@ function appendHeader(familyName, controlPanel, reset, invert) {
   labels.style.flexDirection = "row";
   labels.style.flexWrap = "nowrap";
   labels.style.justifyContent = "space-between";
-  labelValueUnits.style.display = "flex";
-  labelValueUnits.style.flexDirection = "row";
-  labelValueUnits.style.flexWrap = "nowrap";
+  if ('units' in sliderParams) {
+    labelValueUnits.style.display = "flex";
+    labelValueUnits.style.flexDirection = "row";
+    labelValueUnits.style.flexWrap = "nowrap";
+  }
   wrapper.style.display = "flex";
   wrapper.style.flexDirection = "column";
 
   labelSlider.appendChild(labelSliderText);
   labelValue.appendChild(labelValueText);
-  labelUnits.appendChild(labelUnitsText);
   labels.appendChild(labelSlider);
   labelValueUnits.appendChild(labelValue);
-  labelValueUnits.appendChild(labelUnits);
+  if ('units' in sliderParams) {
+    labelUnits.appendChild(labelUnitsText);
+    labelValueUnits.appendChild(labelUnits);
+  }
   labels.appendChild(labelValueUnits);
   wrapper.appendChild(labels);
   wrapper.appendChild(slider);
@@ -723,8 +749,28 @@ function parseFeatures(input) {
   }
 }
 
+function parseVariations(input) {
+  const patternVariationBlocks = /^\s*\((?<label>[\p{L}\p{P}\p{N}\p{Zs}]+?)\|(?<axis>[\p{L}\p{P}\p{N}\p{Zs}]+?)\s+\[(?<min>-?\d+(\.\d+)?)\s*\.\.\s*(?<value>-?\d+(\.\d+)?)\s*\.\.\s*(?<max>-?\d+(\.\d+)?)\]\)\s*/ugm;
+  
+  try {
+    const variations = [...input.matchAll(patternVariationBlocks)].map((match) => ({
+      label: match.groups.label,
+      axis: match.groups.axis,
+      min: parseFloat(match.groups.min),
+      value: parseFloat(match.groups.value),
+      default: parseFloat(match.groups.value),
+      max: parseFloat(match.groups.max)
+    }));
+    
+    return variations;
 
-let LOGGING_IS_ON = false;
+  } catch (error) {
+    console.error(`${error.message}`);
+    return;
+  }
+}
+
+let LOGGING_IS_ON = true;
 
 function log(message) {
   if (LOGGING_IS_ON) {console.log(message)};
