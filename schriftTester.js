@@ -95,10 +95,10 @@ class TesterView {
 
 
   invert() {
-    if (document.body.getAttribute('data-theme')) {
-      document.body.removeAttribute('data-theme');
+    if (this.container.getAttribute('data-theme')) {
+      this.container.removeAttribute('data-theme');
     } else {
-      document.body.setAttribute('data-theme', 'invert');
+      this.container.setAttribute('data-theme', 'invert');
   }
   }
 
