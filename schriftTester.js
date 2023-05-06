@@ -23,10 +23,8 @@ class TesterView {
           appendHeader(this.config[elem], this.controlPanel, this.reset.bind(this), this.invert.bind(this));
           break;        
         case "variations":
-          for (const axis in this.config[elem]) {
-            log('!!!!!variations!!!!!')
-            log(this.config[elem][axis])
-            appendSlider(this.config[elem][axis], this.controlPanel, this.update.bind(this), elem);
+          for (const variation_number in this.config[elem]) {
+            appendSlider(this.config[elem][variation_number], this.controlPanel, this.update.bind(this), elem);
           };
           break;
         case "fontSize":
@@ -77,6 +75,7 @@ class TesterView {
 
   reset() {
     for (const propName in this.config) {
+      console.log("propName: ", propName, "\nthis.config[propName]: ", this.config[propName])
       if (
         typeof this.config[propName] === "object" &&
         "default" in this.config[propName]
@@ -94,9 +93,18 @@ class TesterView {
             this.config[propName][subPropName].tags[tag].value =
             this.config[propName][subPropName].tags[tag].default;
           }
+        };
+        if (
+          typeof this.config[propName][subPropName] === "object" &&
+          "axis" in this.config[propName][subPropName]
+          ) {
+            console.log("!_!_!_propName, subPropName, this.config[propName][subPropName]: ", propName, subPropName,  this.config[propName][subPropName],
+            "propName: ", propName, 
+            "subPropName: ", subPropName)
+            this.config[propName][subPropName].value = this.config[propName][subPropName].default
+          };
           this.update(propName);
           this.updateView(propName)
-        }
       }
     }
   }
@@ -119,6 +127,12 @@ class TesterView {
         this.config.features[blockIndex].tags.forEach((_, featureIndex) => {
           this.controlPanel.features[blockIndex][featureIndex].value = this.config.features[blockIndex].tags[featureIndex].default;
         })})
+    }
+    if (propName === "variations"){
+      this.config.variations.forEach((variation, _) => {
+          const axis = variation.axis;
+          this.controlPanel.variations[axis].value = variation.defalut;
+        })
     }
   }
   update(propName) {
@@ -183,13 +197,13 @@ class TesterConfig {
     this.labelFont = null;
     this.fontFamily = null;
     this.style = { label: "Style", default: "Regular", value: "Regular", options: ["Regular"], visible: true, };
-    this.variations = {};
+    this.variations = [];
     this.fontSize = { label: "Size", default: 80, value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
     this.lineHeight = { label: "Leading", default: 100, value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.letterSpacing = { label: "Tracking", default: 0, value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.alignment = { label: "Left", default: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
     this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
-    this.features = {};
+    this.features = [];
     this.text = "";
     this.editable = true;
     this.init()
@@ -204,7 +218,7 @@ class TesterConfig {
         case "labelFont":
         case "controlPlacement":
         case "fontFamily":
-          this[key] = value
+          this[key] = value;
           break;
         case "alignment":
         case "case":
@@ -217,8 +231,8 @@ class TesterConfig {
             }
           }
           if (key === "style"){
-          this[key]['label'] = this[key]['value'];
-        }
+            this[key]['label'] = this[key]['value'];
+          }
           break;
         case "fontSize":
         case "lineHeight":
@@ -228,9 +242,9 @@ class TesterConfig {
           for (const [paramKey, paramValue] of Object.entries(sliderParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
-              log(`${key} => ${paramKey}: ${paramValue}`);
+              log(`parsed ${key} => ${paramKey}: ${paramValue}`);
             } else {
-              log(`${key} -| ${paramKey}: ${paramValue}`);
+              log(`parsed ${key} -| ${paramKey}: ${paramValue}`);
               if (paramKey === "unitsLabel") {
                 if (sliderParams.units) {
                   this[key][paramKey] = sliderParams.units;
@@ -244,11 +258,11 @@ class TesterConfig {
           break;
         case "features":
           this[key] = parseFeatures(value.trim())
-          log(`${key} => ${JSON.stringify(this[key])}`);
+          log(`parsed ${key} => ${JSON.stringify(this[key])}`);
           break;
         case "variations":
           this[key] = parseVariations(value.trim())
-          log(`${key} => ${JSON.stringify(this[key])}`);
+          log(`parsed ${key} => ${JSON.stringify(this[key])}`);
           break;
         
         } 
@@ -470,7 +484,9 @@ function appendHeader(familyName, controlPanel, reset, invert) {
   }
 
   function appendSlider(sliderParams, controlPanel, update, propName) {
-    controlPanel[propName] = {};
+    if (!(propName in controlPanel)) {
+      controlPanel[propName] = {};
+    }
     var wrapper = document.createElement("div");
     var labels = document.createElement("div");
     var labelSlider = document.createElement("div");
@@ -540,6 +556,24 @@ function appendHeader(familyName, controlPanel, reset, invert) {
     update(propName, sliderParams.value);
   }
 
+  console.log("propName", propName)
+  console.log("controlPanel[propName]", controlPanel[propName])
+  console.log("sliderParams.axis", sliderParams.axis)
+  
+  if (propName === "variations") {
+    if (!(sliderParams.axis in controlPanel[propName])) {
+      controlPanel[propName][sliderParams.axis] = {}
+    }
+    console.log("111222333",controlPanel[propName])
+    Object.defineProperty(controlPanel[propName][sliderParams.axis], "value", {
+      set: function(newValue) {
+        labelValue.innerHTML = newValue;
+        slider.value = newValue;
+      },
+      configurable: true 
+    });
+  }
+  else {
   Object.defineProperty(controlPanel[propName], "value", {
     set: function(newValue) {
       labelValue.innerHTML = newValue;
@@ -547,6 +581,7 @@ function appendHeader(familyName, controlPanel, reset, invert) {
     },
     configurable: true 
   });
+}
 
   labels.style.display = "flex";
   labels.style.flexDirection = "row";
@@ -761,7 +796,6 @@ function parseVariations(input) {
       default: parseFloat(match.groups.value),
       max: parseFloat(match.groups.max)
     }));
-    
     return variations;
 
   } catch (error) {
