@@ -98,9 +98,6 @@ class TesterView {
           typeof this.config[propName][subPropName] === "object" &&
           "axis" in this.config[propName][subPropName]
           ) {
-            console.log("!_!_!_propName, subPropName, this.config[propName][subPropName]: ", propName, subPropName,  this.config[propName][subPropName],
-            "propName: ", propName, 
-            "subPropName: ", subPropName)
             this.config[propName][subPropName].value = this.config[propName][subPropName].default
           };
           this.update(propName);
@@ -131,7 +128,7 @@ class TesterView {
     if (propName === "variations"){
       this.config.variations.forEach((variation, _) => {
           const axis = variation.axis;
-          this.controlPanel.variations[axis].value = variation.defalut;
+          this.controlPanel.variations[axis].value = variation.default;
         })
     }
   }
