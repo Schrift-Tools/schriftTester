@@ -716,7 +716,7 @@ function parseListParams(input) {
 
       // If input is unnamed
     } else {
-      const options = input.split(";").map((option) => option.trim()); // Extract options from input
+      const options = input.replace(/;+$/, "").split(";").map((option) => option.trim()); // Extract options from input
       const defaultValueIndex = options.findIndex((option) => option.endsWith("*"));
     
       let defaultValue;
