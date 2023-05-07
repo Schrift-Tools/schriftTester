@@ -690,14 +690,15 @@ function parseSliderParams(input) {
 
 function parseListParams(input) {
   const patternNamedList = /^([a-zA-Z0-9_ ]+)?\s*\[(.+)\]$/;
-  const patternUnnamedList = /^(.+?)(\*?)$/;
+  // const patternUnnamedList = /^(.+?)(\*?)$/;
   try {
     // Check if input matches named or unnamed pattern
     const matchNamed = input.match(patternNamedList);
-    const matchUnnamed = input.match(patternUnnamedList);
+    // const matchUnnamed = input.match(patternUnnamedList);
 
     // If input is named
     if (matchNamed) {
+      log(`there is matchNamed`)
       const label = matchNamed[1].trim(); // Extract label from input
       const options = matchNamed[2]
         .split(/[;,]/)
@@ -714,38 +715,27 @@ function parseListParams(input) {
           return { label: label, default: defaultValue, value: defaultValue, options: optionsOptions };
 
       // If input is unnamed
-    } else if (matchUnnamed) {
-      const label = undefined; // Label is undefined for unnamed inputs
-      const optionsString = matchUnnamed[1]; // Extract options from input
-      const hasDefault = matchUnnamed[2] !== ""; // Check if there is a default value
-
-      // If there are multiple options
-      if (optionsString.includes(";")) {
-        const options = optionsString.split(";").map((option) => option.trim()); // Extract options from input
-        const defaultValueIndex = options.findIndex((option) =>
-          option.endsWith("*")
-        ); // Find index of default value
-        const defaultValue =
-          defaultValueIndex >= 0
-            ? options[defaultValueIndex].slice(0, -1)
-            : options[0]; // Extract default value from options
-        const optionsOptions = options.map(
-          (option) => option.endsWith("*") ? option.slice(0, -1) : option
-        ); // Extract options options from options
-        return { label: label, value: defaultValue, options: optionsOptions };
-
-        // If there is a default value, but only one option
-      } else if (hasDefault) {
-        const value = optionsString; // Extract default value
-        return { label: label, default: value, value: value, options: undefined };
-
-        // If there is no default value and only one option
+    } else {
+      const options = input.split(";").map((option) => option.trim()); // Extract options from input
+      const defaultValueIndex = options.findIndex((option) => option.endsWith("*"));
+    
+      let defaultValue;
+      let value;
+      let optionsOptions;
+    
+      if (defaultValueIndex !== -1) {
+        defaultValue = options[defaultValueIndex].slice(0, -1); // Remove asterisk
+        value = defaultValue;
+        optionsOptions = options.map((option) => option.endsWith("*") ? option.slice(0, -1) : option); // Remove asterisk from all options
       } else {
-        const value = optionsString; // Extract value
-        return { label, default: value, value: value, options: undefined };
+        defaultValue = options[0];
+        value = defaultValue;
+        optionsOptions = options;
       }
+    
+      return { default: defaultValue, value: value, options: optionsOptions };
     }
-    throw new Error(`Invalid option list params string: ${input}`);
+    // throw new Error(`Invalid option list params string: ${input}`);
   } catch (error) {
     console.error(`${error.message}`);
     return;
