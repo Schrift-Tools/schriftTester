@@ -3,14 +3,16 @@ class TesterView {
   constructor(config, container) {
     this.config = config;
     this.container = container;
-    this.controlPanel = newControlPanel(config.controlPlacement, container);
-    this.textSampleArea = appendTextSampleArea(config, container);
-    this.init();
-  }
-
-  init() {
-    this.setContainerStyle();
-    this.placeUIElements();
+    document.fonts.load("1em " + this.config.fontFamily).then(
+      this.init()
+    );
+    }
+    
+    init() {
+      this.controlPanel = newControlPanel(this.config.controlPlacement, this.container);
+      this.textSampleArea = appendTextSampleArea(this.config, this.container);
+      this.setContainerStyle();
+      this.placeUIElements();
     for (const option in this.config) {
       this.update(option);
     }
