@@ -3,9 +3,11 @@ class TesterView {
   constructor(config, container) {
     this.config = config;
     this.container = container;
-    document.fonts.load("1em " + this.config.fontFamily).then(
-      this.init()
-    );
+    async function initWhenReady() {
+      await document.fonts.ready;
+      this.init();
+    }
+    initWhenReady.bind(this)();
     }
     
     init() {
