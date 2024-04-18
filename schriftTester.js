@@ -197,7 +197,7 @@ class TesterConfig {
     this.controlPlacement = { panel: 'left' };
     this.labelFont = null;
     this.fontFamily = null;
-    this.style = { label: "Style", default: "Regular", value: "Regular", options: ["Regular"], visible: false, };
+    this.style = { label: "Style", default: "Regular", value: "Regular", options: ["Regular"], visible: true, };
     this.variations = [];
     this.fontSize = { label: "Size", default: 80, value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
     this.lineHeight = { label: "Leading", default: 100, value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
