@@ -291,23 +291,33 @@ function initTesters() {
 }
 
 function appendFeatures(config, controlPanel, update) {
-  controlPanel['features'] = []
+  controlPanel['features'] = [];
   const features = config.features;
-  var wrapper = document.createElement("div");
-  
+  var featureWrapper = document.createElement("div");
+  featureWrapper.classList.add("tester-feature-wrapper");
+
   features.forEach((featureBlock, blockIndex) => {
-    controlPanel['features'].push([])
+    controlPanel['features'].push([]);
     var block = document.createElement("div");
     var blockLabel = document.createElement("div");
     var blockLabelText = document.createTextNode(featureBlock.label);
+    var toggleIcon = document.createElement("div");
+    toggleIcon.innerHTML = "@plus";
+
     block.appendChild(blockLabel);
     blockLabel.appendChild(blockLabelText);
+    blockLabel.appendChild(toggleIcon);
 
     block.classList.add("tester-feature-block");
     blockLabel.classList.add("tester-feature-block-label");
+    toggleIcon.classList.add("tester-icons");
+    toggleIcon.classList.add("tester-icons-toggle");
+
+    var blockContent = document.createElement("div");
+    blockContent.classList.add("tester-feature-block-content");
 
     featureBlock.tags.forEach((tag, featureIndex) => {
-      controlPanel['features'][blockIndex].push([])
+      controlPanel['features'][blockIndex].push([]);
       var tagElement = document.createElement("div");
       var tagControl = document.createElement("div");
       var tagInput = document.createElement("input");
@@ -315,7 +325,7 @@ function appendFeatures(config, controlPanel, update) {
       var tagLabelText = document.createTextNode(tag.label);
       var tagCode = document.createElement("div");
       var tagCodeText = document.createTextNode(tag.tag);
-      
+
       tagInput.type = featureBlock.type;
       tagInput.name = featureBlock.label;
       tagInput.checked = parseInt(tag.value);
@@ -327,19 +337,17 @@ function appendFeatures(config, controlPanel, update) {
             });
           }
           config.features[blockIndex].tags[featureIndex].value = 1;
-      } else {
+        } else {
           config.features[blockIndex].tags[featureIndex].value = 0;
-        };
+        }
         update("features");
-        
       };
       Object.defineProperty(controlPanel["features"][blockIndex][featureIndex], "value", {
-        set: function(newValue) {
+        set: function (newValue) {
           tagInput.checked = parseInt(newValue);
         },
-        configurable: true 
+        configurable: true,
       });
-      log(`!!!${tag.label}, tag.value: ${tag.value}`)
 
       tagControl.style.display = "flex";
       tagControl.style.flexDirection = "row";
@@ -354,7 +362,7 @@ function appendFeatures(config, controlPanel, update) {
       } else if (tagInput.type === "checkbox") {
         tagInput.classList.add("tester-checkbox");
       }
-      
+
       tagElement.classList.add("tester-feature-tag");
       tagLabel.classList.add("tester-feature-tag-label");
       tagCode.classList.add("tester-feature-tag-code");
@@ -365,12 +373,28 @@ function appendFeatures(config, controlPanel, update) {
       tagControl.appendChild(tagLabel);
       tagElement.appendChild(tagControl);
       tagElement.appendChild(tagCode);
-      block.appendChild(tagElement);
-    });    
-    wrapper.appendChild(block);
-  })
-  controlPanel.container.appendChild(wrapper);
+      blockContent.appendChild(tagElement);
+    });
+    block.appendChild(blockContent);
+    featureWrapper.appendChild(block);
+
+    // Add event listener for toggling
+    blockLabel.addEventListener('click', function () {
+      if (blockContent.style.display === "none") {
+        blockContent.style.display = "block";
+        toggleIcon.innerHTML = "@close";
+      } else {
+        blockContent.style.display = "none";
+        toggleIcon.innerHTML = "@plus";
+      }
+    });
+
+    // Initially collapse the content
+    blockContent.style.display = "none";
+  });
+  controlPanel.container.appendChild(featureWrapper);
 }
+
 
 
 function appendDropdown(config, propName, controlPanel, update) {

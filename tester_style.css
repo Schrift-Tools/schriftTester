@@ -55,13 +55,12 @@
 .control-panel {
   font-family: "Struve Regular";
   font-size: 16px;
-  min-width: 319px;
+  min-width: 326px;
   padding: 16px 32px 64px 32px;
   border: 0 solid var(--tester-stroke-light);
   overflow: auto;
   max-height: 100vh;
   scrollbar-width: none;
-  /* border-color: var(#FF00FF*/
 }
 .control-panel::-webkit-scrollbar {
   display: none;
@@ -147,13 +146,27 @@
   outline: 1px solid var(--tester-background-main);
   outline-offset: -1px;
 }
-
-.tester-feature-block {
-  margin: 39px 0 14px 0;
+.tester-feature-wrapper {
+  margin: 32px 0 0 0;
 }
+.tester-feature-block {
+  margin: 0px -32px 14px -32px;
+  padding: 0px 32px 0 32px;
+  border-bottom: 1px solid var(--tester-stroke-normal);
+}
+
+.tester-feature-block-content {
+  margin: 0 0 32px 0;
+  }
+
 .tester-feature-block-label {
-  margin: 0 0 18px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  margin: 0 0 16px 0;
   color: var(--tester-text-muted);
+
 }
 .tester-radio-button {
   appearance: none;
@@ -181,11 +194,12 @@
   background-color: var(--tester-features-active);
 }
 .tester-feature-tag {
-  margin: 8px 0 4px 0;
+  margin: 8px 0 10px 0;
 }
 
 .tester-feature-tag-label {
   color: var(--tester-text-body);
+  hyphens: auto;  
 }
 
 .tester-feature-tag-code {
