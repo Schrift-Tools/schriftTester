@@ -157,6 +157,9 @@
 
 .tester-feature-block-content {
   margin: 0 0 32px 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease-out;
   }
 
 .tester-feature-block-label {

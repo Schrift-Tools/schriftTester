@@ -383,9 +383,11 @@ function appendFeatures(config, controlPanel, update) {
       if (blockContent.style.display === "none") {
         blockContent.style.display = "block";
         toggleIcon.innerHTML = "@close";
+        blockContent.style.maxHeight = blockContent.scrollHeight + "px";
       } else {
         blockContent.style.display = "none";
         toggleIcon.innerHTML = "@plus";
+        blockContent.style.maxHeight = null;
       }
     });
 
