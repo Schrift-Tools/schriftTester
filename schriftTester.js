@@ -13,9 +13,10 @@ class TesterView {
     init() {
       this.controlPanel = newControlPanel(this.config.controlPlacement, this.container);
       this.textSampleArea = appendTextSampleArea(this.config, this.container);
-      this.setContainerStyle();
       this.placeUIElements();
-    for (const option in this.config) {
+      this.setContainerStyle();
+
+      for (const option in this.config) {
       this.update(option);
     }
   }
@@ -634,7 +635,6 @@ function appendHeader(familyName, controlPanel, reset, invert) {
   wrapper.appendChild(labels);
   wrapper.appendChild(slider);
   controlPanel.container.appendChild(wrapper);
-
 }
 
 function newControlPanel(align, container) {
@@ -644,10 +644,12 @@ function newControlPanel(align, container) {
     case "left":
       controlPanel.container.style.borderWidth = "0 1px 0 0";
       controlPanel.container.style.minHeight = "100vh";
+      controlPanel.container.classList.add("control-panel-top-or-bottom");
       break;
     case "right":
       controlPanel.container.style.borderWidth = " 0 0 0 1px";
       controlPanel.container.style.minHeight = "100vh";
+      controlPanel.container.classList.add("control-panel-top-or-bottom");
       break;
     case "top":
       controlPanel.container.style.borderWidth = "1px 0 0 0";
