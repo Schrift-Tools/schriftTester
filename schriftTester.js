@@ -50,7 +50,9 @@ class TesterView {
         }
         break;
         case "case": {
-          appendCase(this.config, this.controlPanel, this.update.bind(this))
+          if (this.config[elem].visible) {
+            appendCase(this.config, this.controlPanel, this.update.bind(this))
+          }
         }
         break;
         case "features": {
@@ -219,7 +221,7 @@ class TesterConfig {
     this.lineHeight = { label: "Leading", default: 100, value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.letterSpacing = { label: "Tracking", default: 0, value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.align = { label: "Left", default: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
-    this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercasecase", "Uppercasecase", "Capitalize"], visible: true, };
+    this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercasecase", "Uppercasecase", "Capitalize"], visible: false, };
     this.features = [];
     this.text = "";
     this.editable = true;
@@ -244,6 +246,7 @@ class TesterConfig {
           for (const [paramKey, paramValue] of Object.entries(optionsParams)) {
             if (paramValue) {
               this[key][paramKey] = paramValue;
+              this[key].visible = true;
               log(`${key} => ${paramKey}: ${paramValue}`);
             }
           }
