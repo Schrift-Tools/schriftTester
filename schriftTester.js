@@ -45,6 +45,14 @@ class TesterView {
           };
         }
         break;
+        case "align": {
+          appendAlign(this.config, this.controlPanel, this.update.bind(this))
+        }
+        break;
+        case "case": {
+          appendCase(this.config, this.controlPanel, this.update.bind(this))
+        }
+        break;
         case "features": {
           appendFeatures(this.config, this.controlPanel, this.update.bind(this))
         }
@@ -165,6 +173,13 @@ class TesterView {
       case "style":
         this.textSampleArea.style.fontFamily = this.config.fontFamily + " " + this.config.style.value
         break;
+      case "align":
+          this.textSampleArea.style["text-align"] = this.config.align.value;
+          console.log(this.config.align.value)
+        break;
+      case "case":
+          this.textSampleArea.style["text-transform"] = this.config.case.value;
+          console.log(this.config.case)
       case "features":
         var features = [];
         for (const featureBlock of this.config["features"]) {
@@ -203,8 +218,8 @@ class TesterConfig {
     this.fontSize = { label: "Size", default: 80, value: 80, min: 4, max: 300, units: 'pt', unitsLabel: null, visible: true, };
     this.lineHeight = { label: "Leading", default: 100, value: 100, min: 75, max: 150, step: 0.1, units: '%', unitsLabel: null, visible: true, };
     this.letterSpacing = { label: "Tracking", default: 0, value: 0, min: 50, max: 100, step: 0.1, units: '%', unitsLabel: null, visible: true, };
-    this.alignment = { label: "Left", default: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
-    this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercase", "Uppercase", "Capitalize"], visible: true, };
+    this.align = { label: "Left", default: "Left", value: "Left", options: ["Left", "Center", "Right", "One line"], visible: true, };
+    this.case = { label: "Case", default: "Unchanged", value: "Unchanged", options: ["Unchanged", "Lowercasecase", "Uppercasecase", "Capitalize"], visible: true, };
     this.features = [];
     this.text = "";
     this.editable = true;
@@ -222,7 +237,7 @@ class TesterConfig {
         case "fontFamily":
           this[key] = value;
           break;
-        case "alignment":
+        case "align":
         case "case":
         case "style":
           const optionsParams = parseListParams(value);
@@ -343,6 +358,7 @@ function appendFeatures(config, controlPanel, update) {
         }
         update("features");
       };
+      
       Object.defineProperty(controlPanel["features"][blockIndex][featureIndex], "value", {
         set: function (newValue) {
           tagInput.checked = parseInt(newValue);
@@ -510,6 +526,204 @@ function appendHeader(familyName, controlPanel, reset, invert) {
   controlPanel.container.appendChild(wrapper);
 
   }
+
+function appendAlign(config, controlPanel, update) {
+  var wrapper = document.createElement("div");
+  var valuePicker = document.createElement("div");
+  var alignLabel = document.createElement("div");
+  var alignLabelText = document.createTextNode(config.align.label);
+  var buttons = document.createElement("div");
+  var leftButton = document.createElement("div");
+  var leftButtonIcon = document.createTextNode("@textleft");
+  var centerButton = document.createElement("div");
+  var centerButtonIcon = document.createTextNode("@textcenter"); 
+  var rightButton = document.createElement("div");
+  var rightButtonIcon = document.createTextNode("@textright"); 
+  var line = document.createElement("div");
+
+  const buttonsState = [leftButton, centerButton, rightButton];
+
+  function updateButtonState(button) {
+    const isActive = button.classList.contains("tester-icons-align-down");
+
+    buttonsState.forEach(btn => {
+      if (btn === button && !isActive) {
+        btn.classList.add("tester-icons-align-down");
+      } else {
+        btn.classList.remove("tester-icons-align-down");
+      }
+    });
+  }
+  switch (config.align.default.toLowerCase()) {
+    case "left":
+      leftButton.classList.toggle("tester-icons-align-down");
+      break;
+    case "right":
+      rightButton.classList.toggle("tester-icons-align-down");
+      break;
+    case "center":
+      centerButton.classList.toggle("tester-icons-align-down");
+      break;
+  }
+  leftButton.onclick = function () {
+    config.align.value = "left";
+    update("align");
+    updateButtonState(leftButton)
+  };
+
+  centerButton.onclick = function () {
+    config.align.value = "center";
+    update("align");
+    updateButtonState(centerButton)
+  };
+
+  rightButton.onclick = function () {
+    config.align.value = "right";
+    update("align");
+    updateButtonState(rightButton)
+  };
+
+  wrapper.classList.add("control-panel-container");
+  alignLabel.classList.add("control-panel-label-name");
+  // buttons.classList.add("tester-icons");
+  leftButton.classList.add("tester-icons-align");
+  leftButton.classList.add("tester-button");
+  centerButton.classList.add("tester-icons-align");
+  centerButton.classList.add("tester-button");
+  rightButton.classList.add("tester-icons-align");
+  rightButton.classList.add("tester-button");
+  line.classList.add("tester-line-separator");
+
+  buttons.style.display = "flex";
+  buttons.style.flexDirection = "row";
+  buttons.style.flexWrap = "nowrap";
+  valuePicker.style.display = "flex";
+  valuePicker.style.flexDirection = "row";
+  valuePicker.style.alignItems = "center";
+  valuePicker.style.flexWrap = "nowrap";
+  valuePicker.style.justifyContent = "space-between";
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = "column";
+
+  alignLabel.appendChild(alignLabelText);
+  leftButton.appendChild(leftButtonIcon);
+  centerButton.appendChild(centerButtonIcon);
+  rightButton.appendChild(rightButtonIcon);
+  buttons.appendChild(leftButton);
+  buttons.appendChild(centerButton);
+  buttons.appendChild(rightButton);
+  valuePicker.appendChild(alignLabel);
+  valuePicker.appendChild(buttons);
+  wrapper.appendChild(valuePicker);
+  wrapper.appendChild(line);
+  controlPanel.container.appendChild(wrapper);
+
+}
+  
+function appendCase(config, controlPanel, update) {
+  var wrapper = document.createElement("div");
+  var valuePicker = document.createElement("div");
+  var caseLabel = document.createElement("div");
+  var caseLabelText = document.createTextNode(config.case.label);
+  var buttons = document.createElement("div");
+  var capitalizeButton = document.createElement("div");
+  var capitalizeButtonIcon = document.createTextNode("Aa");
+  var uppercaseButton = document.createElement("div");
+  var uppercaseButtonIcon = document.createTextNode("AA"); 
+  var lowercaseButton = document.createElement("div");
+  var lowercaseButtonIcon = document.createTextNode("aa"); 
+  var line = document.createElement("div");
+
+  const buttonsState = [capitalizeButton, uppercaseButton, lowercaseButton];
+
+  function updateButtonState(button) {
+    const isActive = button.classList.contains("tester-case-down");
+
+    buttonsState.forEach(btn => {
+      if (btn === button && !isActive) {
+        btn.classList.add("tester-case-down");
+      } else {
+        btn.classList.remove("tester-case-down");
+      }
+    });
+  }
+
+  capitalizeButton.onclick = function () {
+    const isActive = capitalizeButton.classList.contains("tester-case-down");
+
+    if (isActive) {
+      config.case.value = "none";
+    } else {
+      config.case.value = "capitalize";
+    }
+
+    update("case");
+    updateButtonState(capitalizeButton);
+  };
+
+  uppercaseButton.onclick = function () {
+    const isActive = uppercaseButton.classList.contains("tester-case-down");
+
+    if (isActive) {
+      config.case.value = "none";
+    } else {
+      config.case.value = "uppercase";
+    }
+
+    update("case");
+    updateButtonState(uppercaseButton);
+  };
+
+  lowercaseButton.onclick = function () {
+    const isActive = lowercaseButton.classList.contains("tester-case-down");
+
+    if (isActive) {
+      config.case.value = "none";
+    } else {
+      config.case.value = "lowercase";
+    }
+
+    update("case");
+    updateButtonState(lowercaseButton);
+  };
+
+  wrapper.classList.add("control-panel-container");
+  caseLabel.classList.add("control-panel-label-name");
+  valuePicker.classList.add("tester-case-container")
+  // buttons.classList.add("tester-icons");
+  capitalizeButton.classList.add("tester-case");
+  capitalizeButton.classList.add("tester-button");
+  uppercaseButton.classList.add("tester-case");
+  uppercaseButton.classList.add("tester-button");
+  lowercaseButton.classList.add("tester-case");
+  lowercaseButton.classList.add("tester-button");
+  line.classList.add("tester-line-separator");
+
+  buttons.style.display = "flex";
+  buttons.style.flexDirection = "row";
+  buttons.style.flexWrap = "nowrap";
+  valuePicker.style.display = "flex";
+  valuePicker.style.flexDirection = "row";
+  valuePicker.style.flexWrap = "nowrap";
+  valuePicker.style.justifyContent = "space-between";
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = "column";
+
+  caseLabel.appendChild(caseLabelText);
+  capitalizeButton.appendChild(capitalizeButtonIcon);
+  uppercaseButton.appendChild(uppercaseButtonIcon);
+  lowercaseButton.appendChild(lowercaseButtonIcon);
+  buttons.appendChild(capitalizeButton);
+  buttons.appendChild(uppercaseButton);
+  buttons.appendChild(lowercaseButton);
+  valuePicker.appendChild(caseLabel);
+  valuePicker.appendChild(buttons);
+  wrapper.appendChild(valuePicker);
+  wrapper.appendChild(line);
+  controlPanel.container.appendChild(wrapper);
+
+}
+  
 
   function appendSlider(sliderParams, controlPanel, update, propName) {
     if (!(propName in controlPanel)) {
