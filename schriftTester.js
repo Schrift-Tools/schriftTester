@@ -544,12 +544,12 @@ function appendAlign(config, controlPanel, update) {
   var rightButtonIcon = document.createTextNode("@textright"); 
   var line = document.createElement("div");
 
-  const buttonsState = [leftButton, centerButton, rightButton];
+  const value = [leftButton, centerButton, rightButton];
 
   function updateButtonState(button) {
     const isActive = button.classList.contains("tester-icons-align-down");
 
-    buttonsState.forEach(btn => {
+    value.forEach(btn => {
       if (btn === button && !isActive) {
         btn.classList.add("tester-icons-align-down");
       } else {
@@ -557,38 +557,51 @@ function appendAlign(config, controlPanel, update) {
       }
     });
   }
-  switch (config.align.default.toLowerCase()) {
-    case "left":
-      leftButton.classList.toggle("tester-icons-align-down");
-      break;
-    case "right":
-      rightButton.classList.toggle("tester-icons-align-down");
-      break;
-    case "center":
-      centerButton.classList.toggle("tester-icons-align-down");
-      break;
+
+  function setButtonState(newValue) {
+    value.forEach(btn => btn.classList.remove("tester-icons-align-down"));
+    switch (newValue.toLowerCase()) {
+      case "left":
+        leftButton.classList.add("tester-icons-align-down");
+        break;
+      case "right":
+        rightButton.classList.add("tester-icons-align-down");
+        break;
+      case "center":
+        centerButton.classList.add("tester-icons-align-down");
+        break;
+    }
   }
+
+  // Define getter and setter for config.align.value
+  Object.defineProperty(config.align, 'value', {
+    get: function() {
+      return this._value;
+    },
+    set: function(newValue) {
+      this._value = newValue;
+      setButtonState(newValue);
+      update("align");
+    }
+  });
+
+  // Initialize the value
+  config.align.value = config.align.default;
+
   leftButton.onclick = function () {
     config.align.value = "left";
-    update("align");
-    updateButtonState(leftButton)
   };
 
   centerButton.onclick = function () {
     config.align.value = "center";
-    update("align");
-    updateButtonState(centerButton)
   };
 
   rightButton.onclick = function () {
     config.align.value = "right";
-    update("align");
-    updateButtonState(rightButton)
   };
 
   wrapper.classList.add("control-panel-container");
   alignLabel.classList.add("control-panel-label-name");
-  // buttons.classList.add("tester-icons");
   leftButton.classList.add("tester-icons-align");
   leftButton.classList.add("tester-button");
   centerButton.classList.add("tester-icons-align");
@@ -620,9 +633,9 @@ function appendAlign(config, controlPanel, update) {
   wrapper.appendChild(valuePicker);
   wrapper.appendChild(line);
   controlPanel.container.appendChild(wrapper);
-
 }
-  
+
+
 function appendCase(config, controlPanel, update) {
   var wrapper = document.createElement("div");
   var valuePicker = document.createElement("div");
@@ -632,9 +645,9 @@ function appendCase(config, controlPanel, update) {
   var capitalizeButton = document.createElement("div");
   var capitalizeButtonIcon = document.createTextNode("Aa");
   var uppercaseButton = document.createElement("div");
-  var uppercaseButtonIcon = document.createTextNode("AA"); 
+  var uppercaseButtonIcon = document.createTextNode("AA");
   var lowercaseButton = document.createElement("div");
-  var lowercaseButtonIcon = document.createTextNode("aa"); 
+  var lowercaseButtonIcon = document.createTextNode("aa");
   var line = document.createElement("div");
 
   const buttonsState = [capitalizeButton, uppercaseButton, lowercaseButton];
@@ -651,6 +664,39 @@ function appendCase(config, controlPanel, update) {
     });
   }
 
+  function setButtonState(newValue) {
+    buttonsState.forEach(btn => btn.classList.remove("tester-case-down"));
+    switch (newValue.toLowerCase()) {
+      case "capitalize":
+        capitalizeButton.classList.add("tester-case-down");
+        break;
+      case "uppercase":
+        uppercaseButton.classList.add("tester-case-down");
+        break;
+      case "lowercase":
+        lowercaseButton.classList.add("tester-case-down");
+        break;
+      default:
+        // No button should be active if value is "none"
+        break;
+    }
+  }
+
+  // Define getter and setter for config.case.value
+  Object.defineProperty(config.case, 'value', {
+    get: function() {
+      return this._value;
+    },
+    set: function(newValue) {
+      this._value = newValue;
+      setButtonState(newValue);
+      update("case");
+    }
+  });
+
+  // Initialize the value
+  config.case.value = config.case.default;
+
   capitalizeButton.onclick = function () {
     const isActive = capitalizeButton.classList.contains("tester-case-down");
 
@@ -659,9 +705,6 @@ function appendCase(config, controlPanel, update) {
     } else {
       config.case.value = "capitalize";
     }
-
-    update("case");
-    updateButtonState(capitalizeButton);
   };
 
   uppercaseButton.onclick = function () {
@@ -672,9 +715,6 @@ function appendCase(config, controlPanel, update) {
     } else {
       config.case.value = "uppercase";
     }
-
-    update("case");
-    updateButtonState(uppercaseButton);
   };
 
   lowercaseButton.onclick = function () {
@@ -685,15 +725,11 @@ function appendCase(config, controlPanel, update) {
     } else {
       config.case.value = "lowercase";
     }
-
-    update("case");
-    updateButtonState(lowercaseButton);
   };
 
   wrapper.classList.add("control-panel-container");
   caseLabel.classList.add("control-panel-label-name");
-  valuePicker.classList.add("tester-case-container")
-  // buttons.classList.add("tester-icons");
+  valuePicker.classList.add("tester-case-container");
   capitalizeButton.classList.add("tester-case");
   capitalizeButton.classList.add("tester-button");
   uppercaseButton.classList.add("tester-case");
@@ -724,8 +760,8 @@ function appendCase(config, controlPanel, update) {
   wrapper.appendChild(valuePicker);
   wrapper.appendChild(line);
   controlPanel.container.appendChild(wrapper);
-
 }
+
   
 
   function appendSlider(sliderParams, controlPanel, update, propName) {
